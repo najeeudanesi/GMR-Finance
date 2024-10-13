@@ -37,7 +37,7 @@ function PatientOverview() {
     try {
       const data = await get(`/patientpayment/${patientId}`);
       setPatient(data);
-      setHmoClass(data.paymentBreakdowns[0].hmoClass);
+      setHmoClass(data?.paymentBreakdowns[0]?.hmoClass?.hmoClass);
       console.log(data);
     } catch (e) {
       console.log(e);
@@ -179,9 +179,9 @@ function PatientOverview() {
 
           <PatientPaymentTable patientId={patientId} />
           <div className="flex justify-end gap-4 mt-5">
-            <button className="status-btn px-5" onClick={handleUpdateModalOpen}>
+            {/* <button className="status-btn px-5" onClick={handleUpdateModalOpen}>
               Update Payment
-            </button>
+            </button> */}
             {/* <button className="comment-btn px-5" onClick={handleMakePayment}>
               Make Payment
             </button> */}

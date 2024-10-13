@@ -30,7 +30,7 @@ function PatientDetails() {
   const getPatientHmoDetails = async () => {
     try {
       const data = await get(`/patientpayment/${patientId}`);
-      setHmoClass(data.paymentBreakdowns[0].hmoClass);
+      setHmoClass(data.paymentBreakdowns[0]?.hmoClass);
       // console.log(data);
     } catch (e) {
       console.log(e);

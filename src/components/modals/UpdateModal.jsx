@@ -1,37 +1,61 @@
-import React, { useState, useEffect } from 'react';
-import { RiCloseFill } from 'react-icons/ri';
-import InputField from '../UI/InputField';
-import TextArea from '../UI/TextArea';
-import { put } from '../../utility/fetch';
-import toast from 'react-hot-toast';
+import React, { useState, useEffect } from "react";
+import { RiCloseFill } from "react-icons/ri";
+import InputField from "../UI/InputField";
+import TextArea from "../UI/TextArea";
+import { put } from "../../utility/fetch";
+import toast from "react-hot-toast";
 
-function UpdateModal({ isOpen, onClose, patientId, patientPaymentId, amountOwed }) {
+function UpdateModal({
+  isOpen,
+  onClose,
+  patientId,
+  patientPaymentId,
+  amountOwed,
+  paymentBreakdownData,
+}) {
   const [currentTime, setCurrentTime] = useState(new Date());
   const [formData, setFormData] = useState({
     patientId: parseInt(patientId, 10),
-    amountPayableBy: 'Patient',
+    amountPayableBy: "Patient",
     amountOwed: amountOwed || 0,
-    amountPaid: '',
+    amountPaid: "",
     availableBalance: 0,
-    comment: ''
+    comment: "",
   });
   const [loading, setLoading] = useState(false);
 
   useEffect(() => {
+    console.log();
     const timer = setInterval(() => setCurrentTime(new Date()), 1000);
     return () => clearInterval(timer);
   }, []);
 
   useEffect(() => {
+    setFormData({
+      patientId: parseInt(paymentBreakdownData?.patientId, 10),
+      amountPayableBy: "Patient",
+      amountOwed: paymentBreakdownData?.patientBalance || 0,
+      amountPaid: "",
+      availableBalance: 0,
+      comment: "",
+    });
+  }, [paymentBreakdownData]);
+
+  useEffect(() => {
     setFormData((prevData) => ({
       ...prevData,
-      availableBalance: (prevData.amountPaid || 0) - (prevData.amountOwed || 0),
+      availableBalance: (prevData.amountOwed || 0) - (prevData.amountPaid || 0),
+
+      amountOwed:
+        formData?.amountPayableBy == "Patient"
+          ? paymentBreakdownData?.patientBalance
+          : paymentBreakdownData?.hmoBalance || 0,
     }));
-  }, [formData.amountPaid, formData.amountOwed]);
+  }, [formData.amountPaid, formData.amountOwed, formData.amountPayableBy]);
 
   const handleChange = (e) => {
     const { name, value } = e.target;
-    const intFields = ['amountOwed', 'amountPaid', 'availableBalance'];
+    const intFields = ["amountOwed", "amountPaid", "availableBalance"];
 
     if (intFields.includes(name)) {
       setFormData({ ...formData, [name]: parseInt(value, 10) });
@@ -46,8 +70,27 @@ function UpdateModal({ isOpen, onClose, patientId, patientPaymentId, amountOwed 
 
     console.log(formData);
 
+    let data = {
+      amountPayableBy: formData.amountPayableBy,
+      paymentsMade: [
+        {
+          patientId: formData.patientId,
+          paymentBreakdownId: paymentBreakdownData.id,
+          amountOwed: formData.amountOwed,
+          amountPaid: formData.amountPaid,
+          availableBalance: formData.availableBalance,
+          comment: formData.comment,
+        },
+      ],
+    };
+
     try {
-      const response = await put(`/patientpayment/payment-patient/${patientPaymentId}/add-update-payment`, formData);
+      const response = await put(
+        `/patientpayment/payment-patient/${paymentBreakdownData?.patientPaymentId}/add-update-payment`,
+        data
+      );
+
+      console.log(response);
 
       toast.success("Payment record updated successfully");
       onClose(); // Close the modal on successful submission
@@ -62,16 +105,22 @@ function UpdateModal({ isOpen, onClose, patientId, patientPaymentId, amountOwed 
   if (!isOpen) return null;
 
   return (
-    <div className='overlay'>
+    <div className="overlay">
       <div className="modal-box max-w-800">
         <div className="p-40">
           <div className="flex justify-between items-center mb-4">
             <h3 className="bold-text">Add an Item</h3>
-            <RiCloseFill className='close-btn pointer' onClick={onClose} />
-            <p className="text-lg text-gray-500">Time: {currentTime.toLocaleTimeString()}</p>
+            <RiCloseFill className="close-btn pointer" onClick={onClose} />
+            <p className="text-lg text-gray-500">
+              Time: {currentTime.toLocaleTimeString()}
+            </p>
           </div>
           <form onSubmit={handleSubmit} className="m-t-20">
-            <div className='flex'> <label htmlFor="amountPayableBy" className='label'>Amount Payable By</label>
+            <div className="flex">
+              {" "}
+              <label htmlFor="amountPayableBy" className="label">
+                Amount Payable By
+              </label>
               <select
                 name="amountPayableBy"
                 value={formData.amountPayableBy}
@@ -79,9 +128,10 @@ function UpdateModal({ isOpen, onClose, patientId, patientPaymentId, amountOwed 
                 required
                 className="input-field"
               >
-                <option value="Patient">Patient</option>
+                <option value="patient">Patient</option>
                 <option value="HMO">HMO</option>
-              </select></div>
+              </select>
+            </div>
 
             <InputField
               label="Amount Owed"

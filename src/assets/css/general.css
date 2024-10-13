@@ -439,3 +439,13 @@ button:focus {
 .text-caption {
   font-size: 11px;
 }
+
+.positiveBalance{
+color: red;
+font-weight: bold;
+}
+
+.zeroBalance{
+  color: #1c811c88;
+  font-weight: bold;
+  }
