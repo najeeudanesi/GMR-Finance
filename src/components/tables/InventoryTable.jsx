@@ -1,18 +1,22 @@
 import React, { useEffect, useState } from "react";
 import { get } from "../../utility/fetch";
+import SearchInput from "../UI/SearchInput";
 
 function InventoryTable() {
   const [inventoryData, setInventoryData] = useState([]);
+  const [filteredData, setFilteredData] = useState([]);
   const [loading, setLoading] = useState(false);
   const [currentPage, setCurrentPage] = useState(1);
   const [pageSize, setPageSize] = useState(10);
   const [totalPages, setTotalPages] = useState(1);
+  const [searchText, setSearchText] = useState("");
 
   const fetchInventoryData = async (page, size) => {
     setLoading(true);
     try {
       const data = await get(`/pharmacyinventory/list/${page}/${size}`);
       setInventoryData(data.resultList);
+      setFilteredData(data.resultList); // Set filtered data initially
       setTotalPages(data.totalPages);
     } catch (e) {
       console.log("Error fetching inventory data:", e);
@@ -28,9 +32,40 @@ function InventoryTable() {
     setCurrentPage(page);
   };
 
+  const handleSearchChange = (event) => {
+    const value = event.target.value;
+    setSearchText(value);
+
+    // Filter inventory data based on the search text
+    const filtered = inventoryData.filter((item) =>
+      item.productName.toLowerCase().includes(value.toLowerCase()) ||
+      item.manufacturer.toLowerCase().includes(value.toLowerCase()) ||
+      item.supplier.toLowerCase().includes(value.toLowerCase()) ||
+      item.inventoryNumber.toLowerCase().includes(value.toLowerCase())
+    );
+
+    setFilteredData(filtered);
+    setCurrentPage(1); // Reset to first page on search
+  };
+
+  // Paginate the filtered data
+  const paginatedData = filteredData.slice(
+    (currentPage - 1) * pageSize,
+    currentPage * pageSize
+  );
+
   return (
-    <div className="w-100 ">
+    <div className="w-100">
       <div className="w-100 none-flex-item m-t-40">
+        <div className="h-20 w-40 pt-3">
+          <SearchInput
+            type="text"
+            onChange={handleSearchChange}
+            value={searchText}
+            name="searchText"
+            placeholder="Search inventory..."
+          />
+        </div>
         <h3 className="mb-3 font-semibold">Pharmacy Inventory</h3>
         {!loading ? (
           <table className="bordered-table">
@@ -47,7 +82,7 @@ function InventoryTable() {
               </tr>
             </thead>
             <tbody className="white-bg view-det-pane">
-              {inventoryData.map((row, index) => (
+              {paginatedData.map((row, index) => (
                 <tr key={index}>
                   <td>{row.productName}</td>
                   <td>{row.categoryId}</td>
