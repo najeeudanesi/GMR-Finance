@@ -1,18 +1,11 @@
 import React, { useState } from "react";
-import SearchInput from "../UI/SearchInput";
 import InventoryTable from "../tables/InventoryTable";
 import ThresholdItemTable from "../tables/ThresholdItemTable";
-import UpdateInventory from "./Patient/UpdateInentory";
+import AddInventory from "./Patient/AddInentory";
 
 function ManageInventory() {
-    const [searchText, setSearchText] = useState("");
 
     const [selectedTab, setSelectedTab] = useState("create-hmo");
-
-    const handleSearchChange = (event) => {
-        console.log('evevt');
-    };
-
     const renderTabContent = () => {
         switch (selectedTab) {
             case "inventory":
@@ -24,9 +17,9 @@ function ManageInventory() {
             case "thresholdItems":
 
                 return <div><ThresholdItemTable /></div>;
-            case "updateInventory":
+            case "addInventory":
 
-                return <div><UpdateInventory /></div>;
+                return <div><AddInventory /></div>;
             default:
                 return (
                     <div>
@@ -41,14 +34,7 @@ function ManageInventory() {
             <div className="m-t-20">...</div>
             <div className="flex justify-between">
                 <div className="m-t-20 bold-text">Manage Inventory</div>
-                <div className="h-20 w-40 pt-3">
-                    <SearchInput
-                        type="text"
-                        onChange={handleSearchChange}
-                        value={searchText}
-                        name="searchText"
-                    />
-                </div>
+              
             </div>
             <div className="tabs flex m-t-20 bold-text">
                 <div
@@ -67,9 +53,9 @@ function ManageInventory() {
                 </div>
                 <div
                     className={`tab-item ${selectedTab === "settings" ? "active" : ""}`}
-                    onClick={() => setSelectedTab("updateInventory")}
+                    onClick={() => setSelectedTab("addInventory")}
                 >
-                    Update Inventory
+                    Add Inventory
                 </div>
             </div>
 
