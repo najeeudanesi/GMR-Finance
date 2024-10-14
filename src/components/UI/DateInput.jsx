@@ -6,7 +6,7 @@ function DateInput(props) {
       {props.label &&
         <div className="label text-sm text-green">{props.label}</div>
       }
-     <input type="date" name="" id="" className="dateinput" />
+      <input type="date" name={props.name} id={props.id} className="dateinput" onChange={props.onChange} value={props.value} disabled={props.disabled} />
     </div>
   );
 }

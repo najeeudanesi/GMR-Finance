@@ -5,6 +5,7 @@ import DateInput from "../../UI/DateInput";
 import FileInput from "../../UI/FileInput";
 import InputField from "../../UI/InputField";
 import TextField from "../../UI/TextField";
+import { useNavigate } from "react-router-dom";
 
 const AddInventory = () => {
   const [formData, setFormData] = useState({
@@ -29,6 +30,8 @@ const AddInventory = () => {
     howToUseIt: "",
   });
 
+  const router = useNavigate();
+
   const [categories, setCategories] = useState([]);
 
   useEffect(() => {
@@ -49,6 +52,7 @@ const AddInventory = () => {
     setFormData({ ...formData, [name]: value });
   };
 
+
   const handleFileChange = (e) => {
     const { name, files } = e.target;
     if (files.length > 0) {
@@ -62,16 +66,17 @@ const AddInventory = () => {
         categoryId: parseInt(formData.categoryId) || 0,
         productName: formData.productName,
         quantity: parseInt(formData.quantity, 10) || 0,
-        thresholdLimit: formData.thresholdLimit || 0,
+        thresholdLimit: parseInt(formData.thresholdLimit, 10) || 0,
         inventoryNumber: formData.inventoryNumber,
         mfgBatchNumber: formData.mfgBatchNumber || "",
+        // Format the dates when constructing the payload
         bestBefore: formatDate(formData.bestBefore),
+        dateSupplied: formatDate(formData.dateSupplied),
         manufacturer: formData.manufacturer,
         costPrice: parseFloat(formData.costPrice) || 0,
         sellingPrice: parseFloat(formData.sellingPrice) || 0,
         description: formData.description,
         dosage: formData.dosage || "",
-        dateSupplied: formatDate(formData.dateSupplied),
         supplier: formData.supplier || "",
         ingredient: formData.ingredient || "",
         cautions: formData.cautions || "",
@@ -84,6 +89,7 @@ const AddInventory = () => {
 
       await post("/pharmacyinventory/inventory", requestBody);
       toast.success("Inventory added successfully");
+      window.location.reload();
     } catch (error) {
       console.error("Error adding inventory:", error);
       toast.error("Failed to add inventory");
@@ -95,6 +101,7 @@ const AddInventory = () => {
     const [year, month, day] = date.split("-");
     return `${day}-${month}-${year}`;
   };
+
 
   return (
     <div className="w-100">
@@ -127,21 +134,21 @@ const AddInventory = () => {
           </div>
           <div className="flex justify-between space-x-2">
 
-          <DateInput label="Best Before" name="bestBefore" type="date" onChange={handleChange} />
-          <DateInput label="Date Supplied" name="dateSupplied" type="date" onChange={handleChange} />
-          </div> 
+            <DateInput label="Best Before" name="bestBefore" type="date" onChange={handleChange} value={formData.bestBefore} />
+            <DateInput label="Date Supplied" name="dateSupplied" type="date" onChange={handleChange} value={formData.dateSupplied} />
+          </div>
           <InputField label="Mfg Batch Number" name="mfgBatchNumber" type="text" onChange={handleChange} />
           <div className="flex justify-between space-x-2">
             <InputField label="Cost Price" name="costPrice" type="text" onChange={handleChange} />
             <InputField label="Selling Price" name="sellingPrice" type="text" onChange={handleChange} />
           </div>
           <div className="flex justify-between space-x-2">
-          <InputField label="Dosage" name="dosage" type="text" onChange={handleChange} />
-          <InputField label="Threshold Limit" name="thresholdLimit" type="text" onChange={handleChange} />
+            <InputField label="Dosage" name="dosage" type="text" onChange={handleChange} />
+            <InputField label="Threshold Limit" name="thresholdLimit" type="text" onChange={handleChange} />
           </div>
           <div className="flex justify-between space-x-2">
-          <InputField label="Supplier" name="supplier" type="text" onChange={handleChange} />
-          <InputField label="Ingredient" name="ingredient" type="text" onChange={handleChange} />
+            <InputField label="Supplier" name="supplier" type="text" onChange={handleChange} />
+            <InputField label="Ingredient" name="ingredient" type="text" onChange={handleChange} />
           </div>
           <TextField label="Cautions" name="cautions" type="textarea" onChange={handleChange} />
           <TextField label="How to Use It" name="howToUseIt" type="textarea" onChange={handleChange} />

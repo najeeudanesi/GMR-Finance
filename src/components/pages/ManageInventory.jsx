@@ -38,7 +38,7 @@ function ManageInventory() {
             </div>
             <div className="tabs flex m-t-20 bold-text">
                 <div
-                    className={`tab-item ${selectedTab === "create-hmo" ? "active" : ""}`}
+                    className={`tab-item ${selectedTab === "inventory" ? "active" : ""}`}
                     onClick={() => setSelectedTab("inventory")}
                 >
                     Inventory
@@ -46,13 +46,13 @@ function ManageInventory() {
 
 
                 <div
-                    className={`tab-item ${selectedTab === "settings" ? "active" : ""}`}
+                    className={`tab-item ${selectedTab === "thresholdItems" ? "active" : ""}`}
                     onClick={() => setSelectedTab("thresholdItems")}
                 >
                     Threshold Items
                 </div>
                 <div
-                    className={`tab-item ${selectedTab === "settings" ? "active" : ""}`}
+                    className={`tab-item ${selectedTab === "addInventory" ? "active" : ""}`}
                     onClick={() => setSelectedTab("addInventory")}
                 >
                     Add Inventory
