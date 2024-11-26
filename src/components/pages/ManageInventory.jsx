@@ -1,39 +1,43 @@
 import React, { useState } from "react";
 import InventoryTable from "../tables/InventoryTable";
 import ThresholdItemTable from "../tables/ThresholdItemTable";
-import UpdateInventory from "./Patient/UpdateInentory";
+import SearchInput from "../UI/SearchInput";
+// import UpdateInventory from "./Patient/UpdateInentory";
 
 function ManageInventory() {
   const [searchText, setSearchText] = useState("");
 
-    const [selectedTab, setSelectedTab] = useState("create-hmo");
+  const [selectedTab, setSelectedTab] = useState("create-hmo");
 
-    const handleSearchChange = (event) => {
-        console.log('evevt');
-    };
+  const handleSearchChange = (event) => {
+    console.log("evevt");
+  };
 
-    const renderTabContent = () => {
-        switch (selectedTab) {
-            case "inventory":
-                return (
-                    <div>
-                        <InventoryTable />
-                    </div>
-                );
-            case "thresholdItems":
+  const renderTabContent = () => {
+    switch (selectedTab) {
+      case "inventory":
+        return (
+          <div>
+            <InventoryTable />
+          </div>
+        );
+      case "thresholdItems":
+        return (
+          <div>
+            <ThresholdItemTable />
+          </div>
+        );
+      // case "updateInventory":
 
-                return <div><ThresholdItemTable /></div>;
-            case "updateInventory":
-
-                return <div><UpdateInventory /></div>;
-            default:
-                return (
-                    <div>
-                        <InventoryTable />
-                    </div>
-                );
-        }
-    };
+      //     return <div><UpdateInventory /></div>;
+      default:
+        return (
+          <div>
+            <InventoryTable />
+          </div>
+        );
+    }
+  };
 
   return (
     <div className="w-100">

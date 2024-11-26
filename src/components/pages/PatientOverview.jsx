@@ -39,15 +39,16 @@ function PatientOverview() {
       setPatient(data);
       setHmoClass(data?.paymentBreakdowns[0]?.hmoClass?.hmoClass);
       console.log(data);
+      getPatientExtraDetails(data?.patient?.id)
     } catch (e) {
       console.log(e);
       toast.error("Failed to fetch patient details");
     }
   };
 
-  const getPatientExtraDetails = async () => {
+  const getPatientExtraDetails = async (id) => {
     try {
-      const data = await get(`/patient/${patientId}`);
+      const data = await get(`/patient/${id}`);
       setExtraDetails(data);
       console.log(data)
     } catch (e) {
@@ -59,7 +60,7 @@ function PatientOverview() {
   useEffect(() => {
     const fetchData = async () => {
       setLoading(true);
-      await Promise.all([getPatientDetails(), getPatientExtraDetails()]);
+      await Promise.all([getPatientDetails(), ]);
       setLoading(false);
     };
     fetchData();
