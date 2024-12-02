@@ -1,6 +1,9 @@
 import React, { useEffect, useState } from "react";
 import { get } from "../../utility/fetch";
 import SearchInput from "../UI/SearchInput";
+import edit from "../../assets/svg/edit.svg";
+import EditInventoryItem from "../modals/EditInventoryItem";
+
 
 function InventoryTable() {
   const [inventoryData, setInventoryData] = useState([]);
@@ -10,6 +13,8 @@ function InventoryTable() {
   const [pageSize, setPageSize] = useState(10);
   const [totalPages, setTotalPages] = useState(1);
   const [searchText, setSearchText] = useState("");
+  const [editModalOpen, setEditModalOpen] = useState(false);
+  const [selectedData, setSelectedData] = useState(null);
 
   const fetchInventoryData = async (page, size) => {
     setLoading(true);
@@ -48,6 +53,11 @@ function InventoryTable() {
     setCurrentPage(1); // Reset to first page on search
   };
 
+  const stageData = (data) => {
+    setSelectedData(data);
+    setEditModalOpen(true);
+  }
+
   // Paginate the filtered data
   const paginatedData = filteredData.slice(
     (currentPage - 1) * pageSize,
@@ -78,7 +88,8 @@ function InventoryTable() {
                 <th>Available Quantity</th>
                 <th>Supplier</th>
                 <th>Inventory Number</th>
-                <th>Action</th>
+                <th>Action Taken</th>
+                <th>Actions</th>
               </tr>
             </thead>
             <tbody className="white-bg view-det-pane">
@@ -92,6 +103,9 @@ function InventoryTable() {
                   <td>{row.supplier}</td>
                   <td>{row.inventoryNumber}</td>
                   <td>{row.actionTaken}</td>
+                  <td> <div className="underline">
+                    <img src={edit} alt="" onClick={() => stageData(row)} className="pointer" />
+                  </div></td>
                 </tr>
               ))}
             </tbody>
@@ -119,6 +133,16 @@ function InventoryTable() {
           </button>
         </div>
       </div>
+
+      {
+        editModalOpen && (
+          <EditInventoryItem
+            closeModal={() => setEditModalOpen(false)}
+            isOpen={editModalOpen}
+            data={selectedData}
+          />)
+      }
+
     </div>
   );
 }
