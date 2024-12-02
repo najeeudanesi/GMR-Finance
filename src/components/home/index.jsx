@@ -1,6 +1,6 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { post } from '../../utility/fetch';
-import { useNavigate } from 'react-router-dom';
+import { useLocation, useNavigate } from 'react-router-dom';
 import InputField from '../UI/InputField';
 import toast from 'react-hot-toast';
 
@@ -14,19 +14,22 @@ const Home = (props) => {
   const [showPassword, setShowPassword] = useState(false);
   const [loading, setLoading] = useState(false);
   const navigate = useNavigate();
+  const location = useLocation();
 
-  const makePostRequest = async () => {
-    if (password === "" || email === "") {
-      toast("Please enter email and password");
-      return
-    }
+  const makePostRequest = async (urltoken) => {
+    // if (password === "" || email === "") {
+    //   toast("Please enter email and password");
+    //   return
+    // }
     setLoading(true);
-    const payload = {
-      email: email,
-      password: password,
-    };
+    // const payload = {
+    //   email: email,
+    //   password: password,
+    // };
     try {
-      const data = await post(`/auth/login/`, payload);
+      // const data = await post(`/auth/login/`, payload);
+    console.log(urltoken)
+      const data = await post(`/Auth/auth?AuthToken=${urltoken}`);
 
 
       sessionStorage.setItem('token', "Bearer " + data.resultList.token);
@@ -48,6 +51,30 @@ const Home = (props) => {
   const toggleShowPassword = () => {
     setShowPassword(!showPassword);
   };
+
+  let urltoken = "";
+  useEffect(() => {
+    const params = new URLSearchParams(location.search);
+    // Get the value of the 'username' parameter
+    urltoken = params.get("emp");
+    console.log(urltoken);
+    // isadvance = params.get("isadvance");
+    // fromdashboard = params.get("fromdashboard");
+    // iscompliance = params.get("iscompliance");
+    // isRequisition = params.get("isRequisition");
+    // isVariation = params.get("isVariation");
+    // requestid = params.get("requestid");
+
+    // console.log(urltoken);
+    urltoken
+      ? makePostRequest(urltoken)
+      : (window.location.href =
+          "https://emr-test.greenzonetechnologies.com.ng/home");
+    // const query = qs.parse(location.search);
+    // // encodeToken({ api: query.base }, 'api');
+    // handleAuthentication(query.emp);
+    // console.log(isadvance);
+  }, []);
 
   return (
     <div className="w-100">

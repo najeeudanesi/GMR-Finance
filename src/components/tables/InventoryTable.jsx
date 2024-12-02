@@ -1,8 +1,12 @@
 import React, { useEffect, useState } from "react";
-import { get } from "../../utility/fetch";
+import { get, del } from "../../utility/fetch";
 import SearchInput from "../UI/SearchInput";
 import edit from "../../assets/svg/edit.svg";
 import EditInventoryItem from "../modals/EditInventoryItem";
+import delet from "../../assets/svg/delete.svg";
+import toast from "react-hot-toast";
+import ConfirmationModal from "../modals/ConfirmationModal";
+
 
 
 function InventoryTable() {
@@ -15,6 +19,8 @@ function InventoryTable() {
   const [searchText, setSearchText] = useState("");
   const [editModalOpen, setEditModalOpen] = useState(false);
   const [selectedData, setSelectedData] = useState(null);
+  const [itemToDelete, setItemToDelete] = useState(0)
+  const [isModalOpen, setIsModalOpen] = useState(false)
 
   const fetchInventoryData = async (page, size) => {
     setLoading(true);
@@ -25,6 +31,20 @@ function InventoryTable() {
       setTotalPages(data.totalPages);
     } catch (e) {
       console.log("Error fetching inventory data:", e);
+    }
+    setLoading(false);
+  };
+
+  const deleteItem = async (itemId) => {
+    setLoading(true);
+    try {
+      await del(`/pharmacyinventory/${itemId}`);
+      toast.success("Item Deleted Successfully");
+      fetchInventoryData();
+    } catch (error) {
+      const errorData = await error?.response?.json();
+      toast.error(errorData?.ErrorData[0] || "Failed to delete Item");
+      console.log(errorData);
     }
     setLoading(false);
   };
@@ -63,6 +83,17 @@ function InventoryTable() {
     (currentPage - 1) * pageSize,
     currentPage * pageSize
   );
+
+
+  const handleDeleteClick = (itemId) => {
+    setItemToDelete(itemId);
+    setIsModalOpen(true);
+  };
+
+  const confirmDelete = () => {
+    deleteItem(itemToDelete);
+    setIsModalOpen(false);
+  };
 
   return (
     <div className="w-100">
@@ -103,8 +134,15 @@ function InventoryTable() {
                   <td>{row.supplier}</td>
                   <td>{row.inventoryNumber}</td>
                   <td>{row.actionTaken}</td>
-                  <td> <div className="underline">
+                  <td className="w-7"> <div className="underline flex gap2">
                     <img src={edit} alt="" onClick={() => stageData(row)} className="pointer" />
+
+                    <img
+                      className="pointer"
+                      src={delet}
+                      alt="delete"
+                      onClick={() => handleDeleteClick(row?.id)}
+                    />
                   </div></td>
                 </tr>
               ))}
@@ -133,6 +171,15 @@ function InventoryTable() {
           </button>
         </div>
       </div>
+
+
+      {isModalOpen && (
+        <ConfirmationModal
+          closeModal={() => setIsModalOpen(false)}
+          confirmAction={confirmDelete}
+          message="Are you sure you want to delete this InventoryItem?"
+        />
+      )}
 
       {
         editModalOpen && (
