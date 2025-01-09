@@ -152,13 +152,13 @@ function PatientPaymentTable({ patientId }) {
                           <tbody>
                             {row?.paymentBreakdowns.map((item, index) => (
                               <tr key={index}>
-                                <td>{item?.category.name}</td>
+                                <td>{item?.category?.name}</td>
                                 <td>{item?.cost}</td>
                                 <td>{item?.hmoDuePay}</td>
                                 <td>{item?.hmoCover}</td>
                                 <td
                                   className={
-                                    item.hmoBalance > 0
+                                    item?.hmoBalance > 0
                                       ? "positiveBalance"
                                       : "zeroBalance"
                                   }
