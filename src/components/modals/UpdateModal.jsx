@@ -4,6 +4,7 @@ import InputField from "../UI/InputField";
 import TextArea from "../UI/TextArea";
 import { put } from "../../utility/fetch";
 import toast from "react-hot-toast";
+import {useNavigate } from "react-router-dom";
 
 function UpdateModal({
   isOpen,
@@ -11,6 +12,7 @@ function UpdateModal({
   patientId,
   patientPaymentId,
   amountOwed,
+  setpaid,
   paymentBreakdownData,
 }) {
   const [currentTime, setCurrentTime] = useState(new Date());
@@ -23,6 +25,8 @@ function UpdateModal({
     comment: "",
   });
   const [loading, setLoading] = useState(false);
+  const navigate = useNavigate();
+
 
   useEffect(() => {
     console.log();
@@ -92,7 +96,10 @@ function UpdateModal({
 
       console.log(response);
 
+
       toast.success("Payment record updated successfully");
+      navigate(`/finance/patients-payment`);
+
       onClose(); // Close the modal on successful submission
     } catch (e) {
       const errMessage = await e.response?.json();

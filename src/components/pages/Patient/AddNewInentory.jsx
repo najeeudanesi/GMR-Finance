@@ -87,12 +87,14 @@ const AddNewInventory = () => {
         ...formData,
         categoryId: +selectedCategoryId,
 
-        productPicture: formData.productPicture
-          ? URL.createObjectURL(formData.productPicture)
-          : null,
-        productBarcode: formData.productPicture
-          ? URL.createObjectURL(formData.productBarcode)
-          : null,
+        productPicture: '',
+        // formData.productPicture
+          // ? URL.createObjectURL(formData.productPicture)
+          // : null,
+        productBarcode: '',
+        // formData.productPicture
+          // ? URL.createObjectURL(formData.productBarcode)
+          // : null,
       };
 
       console.log(requestBody);
@@ -234,7 +236,7 @@ const AddNewInventory = () => {
           />
         </div>
 
-        <div className="flex justify-between flex-col m-5">
+        {/* <div className="flex justify-between flex-col m-5">
           <FileInput
             name="productPicture"
             type="file"
@@ -247,7 +249,7 @@ const AddNewInventory = () => {
             accept="image/jpg,image/png,image/jpeg"
             onChange={handleFileChange}
           />
-        </div>
+        </div> */}
       </div>
       <div className="m-t-20">
         <button className="btn w-40" onClick={handleSubmit}>

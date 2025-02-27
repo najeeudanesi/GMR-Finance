@@ -20,8 +20,8 @@ function AddCost({ closeModal, fetchData }) {
     { name: "Equipment", id: 2 },
     { name: "Other Services", id: 3 },
   ]);
-  const [selectedCategoryId, setSelectedCategoryId] = useState(8);
-  const [serviceId, setServiceId] = useState(1);
+  const [selectedCategoryId, setSelectedCategoryId] = useState('');
+  const [serviceId, setServiceId] = useState("");
 
   const [itemNameError, setItemNameError] = useState(null);
   const [itemIdError, setItemIdError] = useState(null);
@@ -54,9 +54,10 @@ function AddCost({ closeModal, fetchData }) {
       console.log(error);
     }
   };
-  const fetchOtherServiceCategory = async () => {
+  const fetchOtherServiceCategory = async (id) => {
+    // https://edogoverp.com/clinicapi/api/categoryitem/list/category/8/1/10
     try {
-      const response = await get("/categoryItem/list/1/1000");
+      const response = await get(`/categoryItem/list/category/${id}/1/1000`);
       //   setEquipmentServicecategories
       // setBedServicecategories
       setOtherServicecategories(response.resultList);
@@ -66,7 +67,7 @@ function AddCost({ closeModal, fetchData }) {
     }
   };
 
-  const fetchBedServiceCategory = async () => {
+  const fetchBedServiceCategory = async (id) => {
     try {
       const response = await get("/bed/list/1/1000");
       //   setEquipmentServicecategories
@@ -96,8 +97,10 @@ function AddCost({ closeModal, fetchData }) {
       isEquipment: selectedCategoryId == 9,
       serviceId: parseInt(serviceId),
       categoryId: parseInt(selectedCategoryId) || 0,
-      itemName: itemName,
-      itemId: parseInt(itemId) || 0,
+      // itemName: itemName,
+      itemId: parseInt(serviceId) || 0,
+      // itemId: parseInt(Math.floor(Math.random() * 10000000)),
+
       unitCost: parseFloat(unitCost) || 0,
     };
 
@@ -158,9 +161,13 @@ function AddCost({ closeModal, fetchData }) {
               value={selectedCategoryId}
               onChange={(e) => {
                 setSelectedCategoryId(e.target.value);
-                setServiceId(1);
+                fetchOtherServiceCategory(e.target.value);
+                
+                // setServiceId(1);
               }}
             >
+                <option value="select">Select Category</option>
+
               {categories.map((category) => (
                 <option key={category.id} value={category.id}>
                   {category.name}
@@ -192,12 +199,15 @@ function AddCost({ closeModal, fetchData }) {
               <label htmlFor="category" className="label">
                 Bed Services
               </label>
+
               <select
                 id="serviceId"
                 className="input-field"
                 value={serviceId}
                 onChange={(e) => setServiceId(e.target.value)}
               >
+                <option value="select">Select Service</option>
+
                 {BedServicecategories.map((category) => (
                   <option key={category.id} value={category.id}>
                     {category.name}
@@ -210,12 +220,14 @@ function AddCost({ closeModal, fetchData }) {
               <label htmlFor="category" className="label">
                 Equipment Services
               </label>
+
               <select
                 id="serviceId"
                 className="input-field"
                 value={serviceId}
                 onChange={(e) => setServiceId(e.target.value)}
               >
+                <option value="select">Select Service</option>
                 {EquipmentServicecategories.map((category) => (
                   <option key={category.id} value={category.id}>
                     {category.name}
@@ -226,14 +238,17 @@ function AddCost({ closeModal, fetchData }) {
           ) : (
             <div className="w-100 m-t-20 flex">
               <label htmlFor="" className="label">
-                Other Services
+                {categories?.find((cat)=>cat.id == selectedCategoryId)?.name }
               </label>
+
               <select
                 id="serviceId"
                 className="input-field"
                 value={serviceId}
                 onChange={(e) => setServiceId(e.target.value)}
               >
+                <option value="select">Select Service</option>
+
                 {OtherServicecategories.map((category) => (
                   <option key={category.id} value={category.id}>
                     {category.itemName}
@@ -243,22 +258,22 @@ function AddCost({ closeModal, fetchData }) {
             </div>
           )}
 
-          <InputField
+          {/* <InputField
             label="Item Name"
             value={itemName}
             onChange={(e) => setitemName(e.target.value)}
           />
           {itemNameError && (
             <span className="error-message">{itemNameError}</span>
-          )}
+          )} */}
 
-          <InputField
+          {/* <InputField
             label="Item #ID"
             value={itemId}
             onChange={(e) => setItemId(e.target.value)}
             type="number"
           />
-          {itemIdError && <span className="error-message">{itemIdError}</span>}
+          {itemIdError && <span className="error-message">{itemIdError}</span>} */}
 
           <InputField
             label="Unit Cost"

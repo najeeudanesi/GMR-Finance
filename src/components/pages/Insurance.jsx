@@ -89,12 +89,12 @@ function Insurance() {
         </div>
 
 
-        <div
+        {/* <div
           className={`tab-item ${selectedTab === "settings" ? "active" : ""}`}
           onClick={() => setSelectedTab("settings")}
         >
           Categories
-        </div>
+        </div> */}
       </div>
 
 

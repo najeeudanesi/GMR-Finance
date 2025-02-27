@@ -19,6 +19,8 @@ function PatientPaymentTable({ patientId }) {
     availableBalance: "",
     comment: "",
   });
+  const [paid, setpaid] = useState(0);
+  
 
   const downloadFile = async (docName) => {
     try {
@@ -204,6 +206,7 @@ function PatientPaymentTable({ patientId }) {
       )}
 
       <UpdateModal
+      setpaid={setpaid}
         isOpen={isUpdateModalOpen}
         onClose={handleUpdateModalClose}
         paymentBreakdownData={paymentBreakdownData}

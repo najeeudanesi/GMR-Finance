@@ -69,7 +69,9 @@ const Home = (props) => {
     urltoken
       ? makePostRequest(urltoken)
       : (window.location.href =
-          "https://emr-test.greenzonetechnologies.com.ng/home");
+          "https://emr.heartlandcardiovascular.com.ng/home");
+          // "https://emr-test.greenzonetechnologies.com.ng/home");
+          
     // const query = qs.parse(location.search);
     // // encodeToken({ api: query.base }, 'api');
     // handleAuthentication(query.emp);

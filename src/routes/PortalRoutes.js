@@ -11,6 +11,7 @@ import PatientOverview from '../components/pages/PatientOverview';
 import PatientsPayments from '../components/pages/PatientsPayments';
 import InsuranceDetails from '../components/pages/insurance-hmo/InsuranceDetails';
 import AuthRoute from './AuthRoute';
+import Settings from '../components/pages/insurance-hmo/Settings';
 
 export default () => (
     <Routes>
@@ -22,6 +23,7 @@ export default () => (
         <Route path="/patients-details/:patientId" element={<AuthRoute><PatientDetails /></AuthRoute>} />
         <Route path="/insurance/:insuranceId" element={<AuthRoute><InsuranceDetails /></AuthRoute>} />
         <Route path="/manage-inventory" element={<AuthRoute><ManageInventory /></AuthRoute>} />
+        <Route path="/settings" element={<AuthRoute><Settings /></AuthRoute>} />
         {/* Render the NotFound component for unmatched routes */}
         <Route path="*" element={<NotFound />} />
     </Routes>

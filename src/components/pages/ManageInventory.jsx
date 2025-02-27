@@ -3,9 +3,9 @@ import InventoryTable from "../tables/InventoryTable";
 import ThresholdItemTable from "../tables/ThresholdItemTable";
 import SearchInput from "../UI/SearchInput";
 // import UpdateInventory from "./Patient/UpdateInentory";
+import UpdateInventory from "./Patient/AddNewInentory";
 
 function ManageInventory() {
-
   const [selectedTab, setSelectedTab] = useState("create-hmo");
 
   const handleSearchChange = (event) => {
@@ -26,9 +26,12 @@ function ManageInventory() {
             <ThresholdItemTable />
           </div>
         );
-      // case "updateInventory":
-
-      //     return <div><UpdateInventory /></div>;
+      case "updateInventory":
+        return (
+          <div>
+            <UpdateInventory />
+          </div>
+        );
       default:
         return (
           <div>
@@ -43,7 +46,6 @@ function ManageInventory() {
       <div className="m-t-20">...</div>
       <div className="flex justify-between">
         <div className="m-t-20 bold-text">Manage Inventory</div>
-
       </div>
       <div className="tabs flex m-t-20 bold-text">
         <div
@@ -53,23 +55,23 @@ function ManageInventory() {
           Inventory
         </div>
 
-
         <div
-          className={`tab-item ${selectedTab === "thresholdItems" ? "active" : ""}`}
+          className={`tab-item ${
+            selectedTab === "thresholdItems" ? "active" : ""
+          }`}
           onClick={() => setSelectedTab("thresholdItems")}
         >
           Threshold Items
         </div>
         <div
-          className={`tab-item ${selectedTab === "addInventory" ? "active" : ""}`}
-          onClick={() => setSelectedTab("addInventory")}
+          className={`tab-item ${
+            selectedTab === "updateInventory" ? "active" : ""
+          }`}
+          onClick={() => setSelectedTab("updateInventory")}
         >
           Add Inventory
         </div>
       </div>
-
-
-
 
       {renderTabContent()}
     </div>

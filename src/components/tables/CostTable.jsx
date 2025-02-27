@@ -14,7 +14,7 @@ function CostTable({ data }) {
                         <tr className="border-top-none">
                             <th>Item Name</th>
                             <th>Category</th>
-                            <th>Item #ID</th>
+                            {/* <th>Item #ID</th> */}
                             <th>Unit Cost</th>
 
                             <th>Entry By:</th>
@@ -29,7 +29,7 @@ function CostTable({ data }) {
                                 <tr key={index}>
                                     <td>{row.serviceName}</td>
                                     <td>{row.category.name}</td>
-                                    <td>{row.itemId}</td>
+                                    {/* <td>{row.itemId}</td> */}
                                     <td>NGN {row.unitCost}</td>
 
                                     <td>{row.createdBy.firstName + " " + row.createdBy.lastName}</td>

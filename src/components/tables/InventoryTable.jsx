@@ -124,7 +124,7 @@ function InventoryTable() {
               </tr>
             </thead>
             <tbody className="white-bg view-det-pane">
-              {paginatedData.map((row, index) => (
+              {filteredData?.map((row, index) => (
                 <tr key={index}>
                   <td>{row.productName}</td>
                   <td>{row.categoryId}</td>
