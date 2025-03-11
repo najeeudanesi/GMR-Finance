@@ -145,14 +145,14 @@ function PatientDetails() {
                   value={hmoClass || "n/a"}
                 />
                 <InputField label={"Validity"} disabled={true} 
-                 value={patient.validity || "n/a"}
+                 value={patient?.validity || "n/a"}
                 />
               </div>
             </div>
             <div className="w-100 flex justify-start m-t-20">
               <div className="w-30">
                 <InputField label={"HMO Service Provider"} disabled={true} 
-                 value={patient.serviceProvider || "n/a"}
+                 value={patient?.serviceProvider || "n/a"}
                 />
               </div>
             </div>

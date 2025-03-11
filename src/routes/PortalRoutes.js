@@ -9,14 +9,18 @@ import NotFound from '../components/pages/NotFound'; // Import your 404 page com
 import PatientDetails from '../components/pages/PatientDetails';
 import PatientOverview from '../components/pages/PatientOverview';
 import PatientsPayments from '../components/pages/PatientsPayments';
+import PatientsPaymentsByAppointment from '../components/pages/PatientsPaymentByAppointment';
 import InsuranceDetails from '../components/pages/insurance-hmo/InsuranceDetails';
 import AuthRoute from './AuthRoute';
 import Settings from '../components/pages/insurance-hmo/Settings';
+import Patients from '../components/pages/Patients';
 
 export default () => (
     <Routes>
         <Route path="/dashboard" element={<AuthRoute><Dashboard /></AuthRoute>} />
         <Route path="/patients-payment" element={<AuthRoute><PatientsPayments /></AuthRoute>} />
+        <Route path="/patients-invoices" element={<AuthRoute><PatientsPaymentsByAppointment /></AuthRoute>} />
+        <Route path="/wallet" element={<AuthRoute><Patients /></AuthRoute>} />
         <Route path="/cost-setup" element={<AuthRoute><CostSetUp /></AuthRoute>} />
         <Route path="/insurance" element={<AuthRoute><Insurance /></AuthRoute>} />
         <Route path="/patients-payment/:patientId" element={<AuthRoute><PatientOverview /></AuthRoute>} />

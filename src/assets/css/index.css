@@ -654,10 +654,55 @@ section {
   margin: 0;
 }
 
-button,
+button {
+  border: none;
+  outline: none;
+}
+.label {
+  background-color: #EBFFE6;
+  padding: 10px;
+  width: 200px;
+  border: 1px solid #3c7e2d73;
+}
+
+.label-box {
+  color: #3C7E2D;
+  background-color: #EBFFE6;
+  border-bottom: 1px solid #3c7e2d73;
+  border-top: 1px solid #3c7e2d73;
+  border-left: 1px solid #3c7e2d73;
+  border-radius: 4px 0px 0px 4px;
+  align-content: center;
+  width: 50%;
+  /* height: 40px; */
+  padding: 2px 16px 2px 16px;
+}
+
+.label-textarea {
+  height: 200px;
+  background-color: #EBFFE6;
+  padding: 10px;
+  color: #3C7E2D;
+  border-radius: 4px 0px 0px 4px;
+  width: 50.8%;
+  border: 1px solid #3c7e2d73;
+
+}
+
+.css-hpavn3-control{
+  border: 1px solid #3c7e2d;
+  border-radius: 4px;
+  background-color: #fff;
+  padding: 8px;
+  width: 100%;
+  height: auto !important;
+}
+
 input {
   border: none;
   outline: none;
+  padding: 8px;
+  height: -webkit-fill-available;
 }
 
 textarea {

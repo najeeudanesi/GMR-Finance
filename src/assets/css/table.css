@@ -1,0 +1,125 @@
+.pointer {
+    cursor: pointer;
+  }
+  
+  .slide-down {
+    transition: all 0.3s ease-in-out;
+  }
+  
+  .form-container {
+    padding: 15px;
+    background-color: #f9f9f9;
+    border: 1px solid #ddd;
+  }
+  
+  form div {
+    margin-bottom: 10px;
+  }
+  
+  form label {
+    font-weight: bold;
+    display: block;
+  }
+  
+  form input {
+    width: 100%;
+    padding: 8px;
+    border: 1px solid #ccc;
+    border-radius: 4px;
+  }
+  
+  button {
+    background-color: #28a745;
+    color: white;
+    padding: 8px 12px;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+  }
+  /* Invoice Container */
+.invoice-container {
+  padding: 20px;
+  background-color: #fff;
+  border: 1px solid #ddd;
+  max-width: 890px;
+  margin: auto;
+  border-radius: 8px;
+  box-shadow: 0px 4px 8px rgba(0, 0, 0, 0.1);
+  /* font-family: "Arial", sans-serif; */
+}
+
+/* Invoice Header */
+.invoice-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  border-bottom: 2px solid #28a745;
+  padding-bottom: 10px;
+  margin-bottom: 20px;
+}
+
+.invoice-header h2 {
+  color: #28a745;
+  margin: 0;
+}
+
+/* Invoice Info */
+.invoice-info p {
+  font-size: 16px;
+  margin: 5px 0;
+}
+
+/* Styled Table */
+.bordered-table {
+  width: 100%;
+  border-collapse: collapse;
+  margin-top: 10px;
+}
+
+.bordered-table th,
+.bordered-table td {
+  border: 1px solid #ddd;
+  padding: 10px;
+  text-align: left;
+}
+
+.bordered-table th {
+  background-color: #28a745;
+  color: white;
+  font-weight: bold;
+}
+
+.bordered-table tbody tr:hover {
+  background-color: #f1f1f1;
+}
+
+/* Back Button */
+.back-button {
+  background: #28a745;
+  color: white;
+  padding: 8px 12px;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+  font-size: 14px;
+}
+
+.back-button:hover {
+  background: #28a745;
+}
+
+/* Print Button */
+.print-button {
+  margin-top: 15px;
+  background: #28a745;
+  color: white;
+  padding: 10px 15px;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+  font-size: 14px;
+}
+
+.print-button:hover {
+  background: #218838;
+}

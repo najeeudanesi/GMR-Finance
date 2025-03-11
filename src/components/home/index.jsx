@@ -32,11 +32,12 @@ const Home = (props) => {
       const data = await post(`/Auth/auth?AuthToken=${urltoken}`);
 
 
-      sessionStorage.setItem('token', "Bearer " + data.resultList.token);
-      sessionStorage.setItem('token-expiry-date', data.resultList.expirationDate)
-      localStorage.setItem('name', (data.resultList.firstName || "user") + " " + (data.resultList.lastName || "name"));
-      localStorage.setItem('role', data.resultList.role || "Finance Admin");
-      localStorage.setItem('userId', data.resultList.userId)
+      sessionStorage.setItem('token', "Bearer " + data?.resultList?.token);
+      sessionStorage.setItem('token-expiry-date', data?.resultList?.expirationDate)
+      localStorage.setItem('name', (data?.resultList?.firstName || "user") + " " + (data?.resultList?.lastName || "name"));
+      localStorage.setItem('role', data?.resultList?.role || "Finance Admin");
+      localStorage.setItem('userId', data?.resultList?.userId)
+      localStorage.setItem('clinicId', data?.resultList?.clinicId)
       localStorage.setItem('USER_INFO', JSON.stringify(data));
       navigate('/finance/dashboard');
 
@@ -69,8 +70,8 @@ const Home = (props) => {
     urltoken
       ? makePostRequest(urltoken)
       : (window.location.href =
-          "https://emr.heartlandcardiovascular.com.ng/home");
-          // "https://emr-test.greenzonetechnologies.com.ng/home");
+          // "https://emr.heartlandcardiovascular.com.ng/home");
+          "https://emr-test.greenzonetechnologies.com.ng/home");
           
     // const query = qs.parse(location.search);
     // // encodeToken({ api: query.base }, 'api');

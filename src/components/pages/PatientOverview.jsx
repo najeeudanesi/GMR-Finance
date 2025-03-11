@@ -5,11 +5,9 @@ import InputField from "../UI/InputField";
 import downloadImg from "../../assets/images/download.png";
 import SearchInput from "../UI/SearchInput";
 import PatientPaymentTable from "../tables/PatientPaymentTable";
-// import HistoricalPaymentsTable from "../tables/HistoricalPaymentsTable";
 import UpdateModal from "../modals/UpdateModal";
 import toast from "react-hot-toast";
 import PaymentHistory from "../modals/PaymentHistory";
-
 
 function PatientOverview() {
   const [patient, setPatient] = useState(null);
@@ -18,6 +16,7 @@ function PatientOverview() {
   const [loading, setLoading] = useState(true);
   const [isUpdateModalOpen, setIsUpdateModalOpen] = useState(false);
   const [isPaymentHistoryOpen, setIsPaymentHistoryOpen] = useState(false);
+  const [isPaymentHistoryCollapsed, setIsPaymentHistoryCollapsed] = useState(true);
   const [hmoClass, setHmoClass] = useState('');
   const [updateFormData, setUpdateFormData] = useState({
     amountPayableBy: "",
@@ -81,17 +80,12 @@ function PatientOverview() {
     });
   };
 
-  // const handleUpdateFormChange = (e) => {
-  //   setUpdateFormData({
-  //     ...updateFormData,
-  //     [e.target.name]: e.target.value,
-  //   });
-  // };
-
-
-
   const handleClosePaymentHistory = () => {
     setIsPaymentHistoryOpen(false);
+  };
+
+  const togglePaymentHistory = () => {
+    setIsPaymentHistoryCollapsed(!isPaymentHistoryCollapsed);
   };
 
   if (loading) {
@@ -188,8 +182,16 @@ function PatientOverview() {
             </button> */}
           </div>
 
-          {/* <h3 className="mt-5 font-semibold">Historical Payments</h3>
-          <HistoricalPaymentsTable patientId={patientId} /> */}
+          <div className="mt-5">
+            <h3 className="font-semibold cursor-pointer save-drafts" onClick={togglePaymentHistory}>
+              {isPaymentHistoryCollapsed ? "Show" : "Hide"} Payment History
+            </h3>
+            {!isPaymentHistoryCollapsed && (
+              <PaymentHistory
+                patientId={patient?.patient?.id}
+              />
+            )}
+          </div>
 
           <UpdateModal
             isOpen={isUpdateModalOpen}
@@ -197,11 +199,6 @@ function PatientOverview() {
             amountOwed={patient?.patientBalance}
             patientId={patient?.patient?.id}
             patientPaymentId={patient?.id}
-          />
-
-          <PaymentHistory
-            isOpen={isPaymentHistoryOpen}
-            onClose={handleClosePaymentHistory}
           />
         </div>
       </div>

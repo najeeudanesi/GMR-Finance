@@ -12,6 +12,7 @@ function PatientPaymentTable({ patientId }) {
   const [isloading, setIsLoading] = useState(false);
   const [isUpdateModalOpen, setIsUpdateModalOpen] = useState(false);
   const [paymentBreakdownData, setPaymentBreakdownData] = useState(null);
+  const [paywithWallet, setPaywithWallet] = useState(false);
   const [updateFormData, setUpdateFormData] = useState({
     amountPayableBy: "",
     amountOwned: "",
@@ -20,7 +21,7 @@ function PatientPaymentTable({ patientId }) {
     comment: "",
   });
   const [paid, setpaid] = useState(0);
-  
+
 
   const downloadFile = async (docName) => {
     try {
@@ -80,6 +81,7 @@ function PatientPaymentTable({ patientId }) {
 
   const handleUpdateModalClose = () => {
     setIsUpdateModalOpen(false);
+    setPaywithWallet(false);
     setUpdateFormData({
       amountPayableBy: "",
       amountOwned: "",
@@ -102,6 +104,7 @@ function PatientPaymentTable({ patientId }) {
     setIsLoading(false);
   };
 
+  console.log(patientId);
   const toggleModal = () => {
     setModalOpen(!modalOpen);
   };
@@ -123,8 +126,8 @@ function PatientPaymentTable({ patientId }) {
             <thead className="border-top-none">
               <tr className="border-top-none">
                 <th className="w-10">Date</th>
-                <th>Diagnosis</th>
-                <th className="w-50">Payment Breakdown</th>
+                <th>Service</th>
+                <th className="w-60">Payment Breakdown</th>
                 <th>Deposit</th>
                 <th>Balance</th>
               </tr>
@@ -186,6 +189,15 @@ function PatientPaymentTable({ patientId }) {
                                     Update Payment
                                   </button>
                                 </td>
+                                <td>
+                                  {" "}
+                                  <button
+                                    className="status-btn px-5"
+                                    onClick={() => { handleUpdateModalOpen(item); setPaywithWallet(true) }}
+                                  >
+                                    Pay From Wallet
+                                  </button>
+                                </td>
                               </tr>
                             ))}
                           </tbody>
@@ -205,15 +217,18 @@ function PatientPaymentTable({ patientId }) {
         <div>Loading....</div>
       )}
 
-      <UpdateModal
-      setpaid={setpaid}
-        isOpen={isUpdateModalOpen}
-        onClose={handleUpdateModalClose}
-        paymentBreakdownData={paymentBreakdownData}
-        amountOwed={paymentBreakdownData?.patientBalance}
-        patientId={paymentBreakdownData?.patient?.id}
-        patientPaymentId={paymentBreakdownData?.id}
-      />
+      {isUpdateModalOpen &&
+        <UpdateModal
+          setpaid={setpaid}
+          isOpen={isUpdateModalOpen}
+          onClose={handleUpdateModalClose}
+          paymentBreakdownData={paymentBreakdownData}
+          amountOwed={paymentBreakdownData?.patientBalance}
+          patientId={paymentBreakdownData?.patient?.id}
+          patientPaymentId={paymentBreakdownData?.id}
+          paywithWallet={paywithWallet}
+        />
+      }
 
       {modalOpen && (
         <ImmunizationAttachment closeModal={toggleModal} data={attachments} />

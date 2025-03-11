@@ -1,38 +1,35 @@
 import React, { useState, useEffect } from "react";
 import { RiCloseFill } from 'react-icons/ri';
 import PaymentHistoryTable from "../tables/PaymentHistoryTable";
+import { get } from "../../utility/fetch";
 
-function PaymentHistory({ onClose, isOpen }) {
+function PaymentHistory({ onClose, isOpen, patientId }) {
   const [currentTime, setCurrentTime] = useState(new Date());
+  const [loading, setLoading] = useState(false);
+  const [PaymentHistory, setPaymentHistory] = useState([]);
 
   useEffect(() => {
-    const timer = setInterval(() => setCurrentTime(new Date()), 1000);
-    return () => clearInterval(timer);
+    getAllPatientsOutstanding();
   }, []);
 
-  if (!isOpen) return null;
+  const getAllPatientsOutstanding = async () => {
+    setLoading(true);
+    try {
+      let res = await get(`/depositwallet/patientid/${patientId}`);
+      setPaymentHistory(res?.data ? res?.data : null);
+    } catch (error) {
+      setPaymentHistory(null);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+
 
   return (
-    <div className='overlay'>
-      <RiCloseFill className='close-btn pointer' onClick={onClose} />
-      <div className="modal-box max-w-800">
-        <div className="p-40">
-          <div className="flex justify-between items-center mb-4">
-            <h3 className="bold-text">Payment History</h3>
-            <p className="text-lg text-gray-500">
-              Time: {currentTime.toLocaleTimeString()}
-            </p>
-          </div>
-          <div className="m-t-20">
-            <PaymentHistoryTable />
-          </div>
-          <button 
-            onClick={onClose}
-            className="btn m-t-20 w-100"
-          >
-            Close
-          </button>
-        </div>
+    <div className='w-100'>
+      <div className="m-t-20">
+        <PaymentHistoryTable data={PaymentHistory} />
       </div>
     </div>
   );
