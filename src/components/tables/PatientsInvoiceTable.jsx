@@ -5,13 +5,15 @@ import { get as gets } from "../../utility/fetch";
 import "../../assets/css/table.css";
 import { RiCloseFill } from "react-icons/ri";
 import cadeuces from "../../assets/images/medicine.png";
+import { usePDF } from "react-to-pdf";
 
 function PatientsInvoiceTable({ data }) {
   // const navigate = useNavigate();
-
+  const { toPDF, targetRef } = usePDF({ filename: "page.pdf" });
   const [openModal, setOpenModal] = useState(false);
   const [appointmentData, setAppointmentData] = useState([]);
   const [selectedRowIndex, setSelectedRowIndex] = useState(null);
+  const [selectedRow, setSelectedRow] = useState(null);
   const [pap, setpap] = useState();
 
   /** Fetch appointments by patient ID */
@@ -46,7 +48,7 @@ function PatientsInvoiceTable({ data }) {
   /** Handle row click and toggle slide-down form */
   const handleRowClick = (index, row) => {
     setSelectedRowIndex(selectedRowIndex === index ? null : index);
-    console.log(row);
+    setSelectedRow(row);
     fetchPatientsBreakdownByAppointmentId(row.id);
   };
 
@@ -87,7 +89,7 @@ function PatientsInvoiceTable({ data }) {
             className="close-btn pointer"
             onClick={() => setOpenModal(false)}
           />
-          
+
           <table className="bordered-table">
             <thead>
               <tr>
@@ -123,7 +125,8 @@ function PatientsInvoiceTable({ data }) {
                             selectedRowIndex === index ? "active" : ""
                           }`}
                         >
-                          <Invoice patient={pap} />
+                          <Invoice ref={targetRef} patient={pap} row={selectedRow} />
+                          <button onClick={() => toPDF()}>Download PDF</button>
                         </div>
                       </td>
                     </tr>
@@ -142,13 +145,25 @@ export default PatientsInvoiceTable;
 
 // Import the new invoice styles
 
-const Invoice = ({ patient, onBack }) => {
+const Invoice = React.forwardRef(({ patient, row }, ref) => {
+  // Compute totals from the payments array
+  const totalPaymentsMade =
+    patient?.payments?.reduce(
+      (acc, payment) => acc + Number(payment.amountPaid),
+      0
+    ) || 0;
+  const totalOutstandingPayments =
+    patient?.payments?.reduce(
+      (acc, payment) => acc + Number(payment.patientBalance),
+      0
+    ) || 0;
+
   return (
-    <div className="invoice-container">
+    <div ref={ref} className="invoice-container">
       <div
         style={{
-          width: "8.5in", // Standard letter width
-          height: "11in", // Standard letter height
+          width: "8.5in",
+          height: "11in",
           margin: "0 auto",
           padding: "1in",
           backgroundColor: "#fff",
@@ -160,16 +175,18 @@ const Invoice = ({ patient, onBack }) => {
       >
         {/* Top Section */}
         <div style={{ textAlign: "center", marginBottom: "1rem" }}>
-          {/* Logo / Symbol (Optional) */}
-          <div style={{ display: "flex", gap: "2rem" }}>
+          <div
+            style={{ display: "flex", gap: "2rem", justifyContent: "center" }}
+          >
             <img
               src={cadeuces}
               alt="Heartland Logo"
               style={{ height: "60px", marginBottom: "0.5rem" }}
             />
-            {/* Main Title */}
-            <h1  style={{ fontSize: "28px", color: "#2d4e8d", margin: "0" }}>
-              <span className="caligraphy">H</span>eartland <span className="caligraphy">C</span>ardiovascular <span className="caligraphy">C</span>onsultants
+            <h1 style={{ fontSize: "28px", color: "#2d4e8d", margin: 0 }}>
+              <span className="caligraphy">H</span>eartland{" "}
+              <span className="caligraphy">C</span>ardiovascular{" "}
+              <span className="caligraphy">C</span>onsultants
             </h1>
           </div>
           <p
@@ -193,13 +210,12 @@ const Invoice = ({ patient, onBack }) => {
           </div>
         </div>
 
-        {/* Body Section (where letter text goes) */}
+        {/* Body Section */}
         <div style={{ minHeight: "6in" }}>
           <div className="invoice-header">
             <h2>Invoice</h2>
-            {/* <button className="back-button" onClick={onBack}>← Back</button> */}
+            {/* <button onClick={onBack}>← Back</button> */}
           </div>
-
           {patient ? (
             <div>
               <div className="invoice-info">
@@ -225,7 +241,7 @@ const Invoice = ({ patient, onBack }) => {
                       <td>N{payment.itemCost}</td>
                       <td>N{payment.amountPaid}</td>
                       <td>N{payment.patientBalance}</td>
-                      {/* <td>{payment.appointmentDate || "N/A"}</td> */}
+                      <td>{row?.appointDate || "N/A"}</td>
                     </tr>
                   ))}
                 </tbody>
@@ -236,10 +252,10 @@ const Invoice = ({ patient, onBack }) => {
                       <strong>Total Payments Made:</strong>
                     </td>
                     <td>
-                      <strong>N{patient?.totalPaymentsMade}</strong>
+                      <strong>N{totalPaymentsMade}</strong>
                     </td>
                     <td>
-                      <strong>N{patient?.totalOutstandingPayments}</strong>
+                      <strong>N{totalOutstandingPayments}</strong>
                     </td>
                     <td></td>
                   </tr>
@@ -266,9 +282,6 @@ const Invoice = ({ patient, onBack }) => {
           The Heart Specialists
         </div>
       </div>
-      <button className="print-button" onClick={() => window.print()}>
-        🖨 Print Invoice
-      </button>
     </div>
   );
-};
+});
