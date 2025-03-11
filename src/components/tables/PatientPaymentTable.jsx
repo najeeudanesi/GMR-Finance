@@ -190,7 +190,6 @@ function PatientPaymentTable({ patientId }) {
                                   </button>
                                 </td>
                                 <td>
-                                  {" "}
                                   <button
                                     className="status-btn px-5"
                                     onClick={() => { handleUpdateModalOpen(item); setPaywithWallet(true) }}

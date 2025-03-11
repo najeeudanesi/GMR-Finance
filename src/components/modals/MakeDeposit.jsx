@@ -14,7 +14,8 @@ function MakeDeposit({ closeModal, }) {
     const patientName = Cookies.get("patientName");
     const [payload, setPayload] = useState({
         amount: 0,
-        transactionPurpose: ''
+        transactionPurpose: '',
+        depositBy: ''
     })
     const [openModal, setOpenModal] = useState(false);
 
@@ -48,16 +49,20 @@ function MakeDeposit({ closeModal, }) {
                 <div className="p-40">
                     <div className="flex gap-16 space-between">
                         <h3 className="bold-text">Make Deposit For {patientName}</h3>
-                        <>
+                        {/* <>
                             <button className="btn w-100" onClick={() => {
                                 setOpenModal(true)
                             }
                             }>
                                 Pay for anoter
-                            </button></>
+                            </button></> */}
                     </div>
                     <div className="w-100 m-t-20 flex">
                         <TagInputs label="Amount" name='amount' onChange={(e) => handleChange(e, 'amount')} value={payload?.amount} variation='number' />
+
+                    </div>
+                    <div className="w-100 m-t-20 flex">
+                        <TagInputs label="Transaction Done By" name='depositBy' onChange={(e) => handleChange(e, 'depositBy')} value={payload?.depositBy}/>
 
                     </div>
                     <div className="w-100 m-t-10 flex">

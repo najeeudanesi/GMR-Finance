@@ -7,7 +7,7 @@ import SearchInput from "../UI/SearchInput";
 import { get } from "../../utility/fetch2";
 import { get as gets } from "../../utility/fetch";
 import SortInput from "../UI/SortInput";
-import Pagination from "../UI/Pagination";
+import Pagination from "../UI/Pagination 2";
 import PatientsInvoiceTable from "../tables/PatientsInvoiceTable";
 
 function PatientsPaymentsByAppointment() {
@@ -34,9 +34,9 @@ function PatientsPaymentsByAppointment() {
       setLoading(true);
       try {
         let data;
-           data = await get(
-            `/patients/filter?pageIndex=${page}&pageSize=${pageSize}&${filter}=${query}`
-          );
+        data = await get(
+          `/patients/filter?pageIndex=${currentPage}&pageSize=${pageSize}&${filter}=${query}`
+        );
         // if (filter && query) {
         //   data = await get(
         //     `/patients/filter/${filter}/${query}/${page}/${pageSize}`
@@ -48,15 +48,16 @@ function PatientsPaymentsByAppointment() {
         // }
         console.log(data)
         setCostData(data.data || []);
-        setTotalPages(data.totalPages || 1);
+        setTotalPages(data.pageCount || 1);
       } catch (error) {
         setCostData([]);
         console.error("Error fetching data:", error);
       }
       setLoading(false);
     },
-    [pageSize]
+    [currentPage]
   );
+
 
   const debouncedFetchData = useCallback(
     debounce((page, filter, query) => fetchData(page, filter, query), 150),
@@ -79,6 +80,25 @@ function PatientsPaymentsByAppointment() {
   const handlePageChange = (page) => {
     setCurrentPage(page);
   };
+
+  const generatePageNumbers = (currentPage, totalPages) => {
+    let pages = [];
+    if (totalPages <= 5) {
+      for (let i = 1; i <= totalPages; i++) {
+        pages.push(i);
+      }
+    } else {
+      if (currentPage <= 3) {
+        pages = [1, 2, 3, 4, totalPages];
+      } else if (currentPage >= totalPages - 2) {
+        pages = [1, totalPages - 3, totalPages - 2, totalPages - 1, totalPages];
+      } else {
+        pages = [1, currentPage - 1, currentPage, currentPage + 1, totalPages];
+      }
+    }
+    return pages;
+  };
+
 
   return (
     <div className="w-100 m-t-80 p-20">
@@ -118,9 +138,9 @@ function PatientsPaymentsByAppointment() {
           <div className="m-t-20 flex flex-h-end">
             <Pagination
               currentPage={currentPage}
-              pageSize={pageSize}
               totalPages={totalPages}
-              onPageChange={handlePageChange}
+              handlePageChange={handlePageChange}
+              generatePageNumbers={generatePageNumbers}
             />
           </div></>)}
 
