@@ -6,7 +6,7 @@ import downloadImg from "../../assets/images/download.png";
 import SearchInput from "../UI/SearchInput";
 import { get } from "../../utility/fetch";
 import SortInput from "../UI/SortInput";
-import Pagination from "../UI/Pagination";
+import Pagination from "../UI/Pagination 2";
 
 function PatientsPayments() {
   const [costData, setCostData] = useState([]);
@@ -25,6 +25,25 @@ function PatientsPayments() {
     { value: "ModifiedBy", label: "Modified By" },
   ];
 
+  const generatePageNumbers = (currentPage, totalPages) => {
+    let pages = [];
+    if (totalPages <= 5) {
+      for (let i = 1; i <= totalPages; i++) {
+        pages.push(i);
+      }
+    } else {
+      if (currentPage <= 3) {
+        pages = [1, 2, 3, 4, totalPages];
+      } else if (currentPage >= totalPages - 2) {
+        pages = [1, totalPages - 3, totalPages - 2, totalPages - 1, totalPages];
+      } else {
+        pages = [1, currentPage - 1, currentPage, currentPage + 1, totalPages];
+      }
+    }
+    return pages;
+  };
+
+
 
   const fetchData = useCallback(
     async (page, filter, query) => {
@@ -41,7 +60,7 @@ function PatientsPayments() {
           );
         }
         setCostData(data.resultList || []);
-        setTotalPages(data.totalPages || 1);
+        setTotalPages(data?.paginationMetadata?.totalPages || 1);
       } catch (error) {
         setCostData([]);
         console.error("Error fetching data:", error);
@@ -110,9 +129,9 @@ function PatientsPayments() {
           <div className="m-t-20 flex flex-h-end">
             <Pagination
               currentPage={currentPage}
-              pageSize={pageSize}
               totalPages={totalPages}
-              onPageChange={handlePageChange}
+              handlePageChange={handlePageChange}
+              generatePageNumbers={generatePageNumbers}
             />
           </div></>)}
 

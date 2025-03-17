@@ -11,6 +11,7 @@ function UpdateModal({
   isOpen,
   onClose,
   patientId,
+  topData,
   patientPaymentId,
   amountOwed,
   setpaid,
@@ -48,12 +49,12 @@ function UpdateModal({
         comment: "",
       });
     }
-  }, [paymentBreakdownData]);
+  }, [paymentBreakdownData, ]);
 
   useEffect(() => {
     setFormData((prevData) => ({
       ...prevData,
-      availableBalance: (prevData.amountOwed || 0) - (prevData.amountPaid || 0),
+      availableBalance: (topData?.patientTotalBalance || 0) - (prevData.amountPaid || 0),
       amountOwed:
         formData?.amountPayableBy === "Patient"
           ? paymentBreakdownData?.patientBalance
@@ -220,7 +221,7 @@ function UpdateModal({
                     required
                     className="input-field"
                   >
-                    <option value="patient">Patient</option>
+                    <option value="Patient">Patient</option>
                     <option value="HMO">HMO</option>
                     <option value="wallet">Pay FRom Wallet</option>
                   </select>
@@ -230,6 +231,14 @@ function UpdateModal({
                   label="Amount Owed"
                   name="amountOwed"
                   value={formData.amountOwed}
+                  onChange={handleChange}
+                  type="number"
+                  disabled
+                />
+                 <InputField
+                  label="Discounted Amount"
+                  name="amountOwed"
+                  value={topData.discountedAmount||0}
                   onChange={handleChange}
                   type="number"
                   disabled
@@ -268,7 +277,7 @@ function UpdateModal({
                     <div
                       className="btn w-10"
                       onClick={() =>
-                        setFormData({ ...formData, amountPayableBy: "" })
+                        setFormData({ ...formData, amountPayableBy: "Patient" })
                       }
                     >
                       Back

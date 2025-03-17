@@ -1,5 +1,4 @@
 @import url('https://fonts.googleapis.com/css2?family=Inter:wght@100..900&display=swap');
-@import url('https://fonts.googleapis.com/css2?family=Dancing+Script:wght@400..700&display=swap');
 body {
   margin: 0;
   font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Oxygen',
@@ -7,25 +6,6 @@ body {
     sans-serif;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
-}
-
-.dancing-script {
-  font-family: "Dancing Script", cursive;
-  font-optical-sizing: auto;
-  font-weight: normal;
-  font-style: normal;
-}
-
-@font-face {
-  font-family: 'kingsguard';
-  src: url('../public/fonts/Kingsguard.otf') format('opentype');
-  /* You could also include WOFF/WOFF2 for better browser support */
-  font-weight: normal;
-  font-style: normal;
-}
-.caligraphy{
-  font-size: 42px;
-  font-family: 'kingsguard'!important
 }
 
 code {

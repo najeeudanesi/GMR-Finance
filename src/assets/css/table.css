@@ -41,11 +41,11 @@
   padding: 20px;
   background-color: #fff;
   border: 1px solid #ddd;
-  max-width: 890px;
+  max-width: 800px;
   margin: auto;
   border-radius: 8px;
   box-shadow: 0px 4px 8px rgba(0, 0, 0, 0.1);
-  /* font-family: "Arial", sans-serif; */
+  font-family: "Arial", sans-serif;
 }
 
 /* Invoice Header */

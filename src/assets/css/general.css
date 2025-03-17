@@ -1,14 +1,3 @@
-@font-face {
-  font-family: 'kingsguard';
-  src: url('../../../public/fonts/Kingsguard.otf') format('opentype');
-  /* You could also include WOFF/WOFF2 for better browser support */
-  font-weight: normal;
-  font-style: normal;
-}
-.caligraphy{
-  font-family: 'kingsguard'!important
-}
-
 .show {
   display: block !important;
 }
