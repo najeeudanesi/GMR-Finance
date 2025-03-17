@@ -227,6 +227,7 @@ function PatientPaymentTable({ patientId }) {
           patientId={paymentBreakdownData?.patient?.id}
           patientPaymentId={paymentBreakdownData?.id}
           paywithWallet={paywithWallet}
+          setPaywithWallet={setPaywithWallet}
         />
       }
 
