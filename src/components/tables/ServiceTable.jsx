@@ -1,12 +1,12 @@
 import React, { useEffect, useState } from "react";
 import { formatDate } from "../../utility/general";
-import { get } from "../../utility/fetch";
+import { get, del } from "../../utility/fetch";
 import ViewVisit from "../modals/ViewVisit";
 import edit from "../../assets/images/edit.png";
 import deletes from "../../assets/images/delete.png";
 import { RiFilePaper2Line } from "react-icons/ri";
 import NurseNotes from "../modals/NurseNotes";
-import { del } from "../../utility/fetchClinicAPi";
+import ServiceEditModal from "../modals/ServiceEditModal";
 
 function ServiceTable({
   data,
@@ -16,16 +16,33 @@ function ServiceTable({
   fetchData,
   setSelectedCategoryId
 }) {
-  const [modalData, setModalData] = useState(null); // State to store the data for the modal
+  const [modalData, setModalData] = useState(false); // State to store the data for the modal
   const [noteModalData, setNoteModalData] = useState(null); // State to store the data for the note modal
-  const [edits, setEdit] = useState(null); // State to store the data for the note modal
+  const [edits, setEdit] = useState({}); // State to store the data for the note modal
+  const [payload, setPayload] = useState({
+    categoryId: 0,
+    itemName: ''
+  });
+  const [categories, setcategories] = useState([]);
+
+  const fetchTreatmentCategory = async () => {
+    try {
+      const response = await get("/categoryItem/list/1/10000");
+      setcategories(response?.resultList);
+    } catch (error) {
+      console.log(error);
+    }
+  };
+  useEffect(() => {
+    fetchTreatmentCategory();
+  }, []);
 
   const handleDelete = async (row) => {
     // return;
     try {
       const response = await del(`/categoryItem/${row.id}`);
       console.log(response);
-      fetchData(1, 10);
+      fetchTreatmentCategory();
     } catch (e) {
       console.log(e);
     }
@@ -35,11 +52,16 @@ function ServiceTable({
 
   const handleEdit = (row) => {
     setEdit(row);
-    console.log(row);
-    setserviceObject(row);
-    setsubCategoryName(row.itemName);
-    setSelectedCategoryId(row.category.id)
+    setModalData(true)
+    // console.log(row);
+    // setserviceObject(row);
+    // setsubCategoryName(row.itemName);
+    // setSelectedCategoryId(row.category.id)
   };
+
+  const handleClose = () => {
+    setModalData(false);
+  }
 
 
 
@@ -59,7 +81,7 @@ function ServiceTable({
             </thead>
 
             <tbody className="white-bg">
-              {data?.map((row) => (
+              {categories?.map((row) => (
                 <tr key={row?.id}>
                   <td>{formatDate(row?.createdOn)}</td>
                   <td>{row?.category.name}</td>
@@ -90,7 +112,12 @@ function ServiceTable({
         <div>Loading....</div>
       )}
 
-      {modalData && <></>}
+      {modalData && <>
+        <ServiceEditModal onSave={() => fetchTreatmentCategory()}
+          data={edits}
+          closeModal={handleClose}
+        />
+      </>}
       {noteModalData && <></>}
     </div>
   );

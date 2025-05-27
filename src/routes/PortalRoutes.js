@@ -1,7 +1,7 @@
 /* eslint-disable import/no-anonymous-default-export */
 import React from 'react';
 import { Route, Routes } from 'react-router-dom';
-import CostSetUp from '../components/pages/CostSetUp';
+import CostSetUp from '../components/pages/CostSetUp copy';
 import Dashboard from '../components/pages/Dashboard';
 import Insurance from '../components/pages/Insurance';
 import ManageInventory from '../components/pages/ManageInventory';

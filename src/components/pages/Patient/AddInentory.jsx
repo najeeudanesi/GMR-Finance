@@ -126,6 +126,7 @@ const AddInventory = () => {
               ))}
             </select>
           </div>
+          
           <InputField label="Product Name" name="productName" type="text" onChange={handleChange} />
           <InputField label="Quantity" name="quantity" type="text" onChange={handleChange} />
           <div className="flex justify-between space-x-2">

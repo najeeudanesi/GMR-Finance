@@ -56,9 +56,10 @@ function PatientsPayments() {
           );
         } else {
           data = await get(
-            `/patientpayment/list/${page}/${pageSize}/patient-payment-list`
+            `/patientpayment/list/${page}/${pageSize}/patient-payment-list-v2`
           );
         }
+        console.log(data.resultList)
         setCostData(data.resultList || []);
         setTotalPages(data?.paginationMetadata?.totalPages || 1);
       } catch (error) {
@@ -118,6 +119,7 @@ function PatientsPayments() {
               <img
                 src={downloadImg}
                 alt={downloadImg}
+                
                 className="w-full h-full object-cover rounded-full"
               />
             </div>

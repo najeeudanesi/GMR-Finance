@@ -36,7 +36,7 @@ function UpdateModal({
   const [loading, setLoading] = useState(false);
   const navigate = useNavigate();
 
-  console.log(paymentBreakdownData?.patientId);
+  console.log(topData);
 
   useEffect(() => {
     if (paymentBreakdownData) {
@@ -54,7 +54,7 @@ function UpdateModal({
   useEffect(() => {
     setFormData((prevData) => ({
       ...prevData,
-      availableBalance: (topData?.patientTotalBalance || 0) - (prevData.amountPaid || 0),
+      availableBalance: (topData?.patientTotalBalance) - (prevData.amountPaid || 0),
       amountOwed:
         formData?.amountPayableBy === "Patient"
           ? paymentBreakdownData?.patientBalance

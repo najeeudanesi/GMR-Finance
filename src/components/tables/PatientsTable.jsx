@@ -12,13 +12,13 @@ function PatientsTable({ data }) {
         <table className="bordered-table">
           <thead className="border-top-none ">
             <tr className="border-top-none ">
-              <th>Patient ID</th>
+              {/* <th>Patient ID</th> */}
               <th>First Name</th>
               <th>Last Name</th>
 
               <th>Outstanding Payment</th>
-              <th>Last Updated By</th>
-              <th>Date Created</th>
+              {/* <th>Last Updated By</th> */}
+              {/* <th>Date Created</th> */}
             </tr>
           </thead>
 
@@ -27,14 +27,14 @@ function PatientsTable({ data }) {
 
 
               return (
-                <tr key={index} className="pointer" onClick={() => navigate(`/finance/patients-payment/${row.id}`)}>
-                  <td>{row.id}</td>
-                  <td>{row?.patient?.firstName}</td>
-                  <td>{row?.patient?.lastName}</td>
+                <tr key={index} className="pointer" onClick={() => navigate(`/finance/patients-payment/${row.paymentDetails[0].patient.id}`)}>
+                  {/* <td>{row.id}</td> */}
+                  <td>{row?.firstName}</td>
+                  <td>{row?.lastname}</td>
 
-                  <td>NGN {row.hmoBalance}</td>
-                  <td>{row.modifiedBy.firstName ? (row.modifiedBy.firstName + " " + row.modifiedBy.lastName) : 'Not Modified'}</td>
-                  <td>{formatDate(row.createdOn)}</td>
+                  <td>NGN {row.outstandingPayment}</td>
+                  {/* <td>{row.modifiedBy.firstName ? (row.modifiedBy.firstName + " " + row.modifiedBy.lastName) : 'Not Modified'}</td> */}
+                  {/* <td>{formatDate(row.createdOn)}</td> */}
                 </tr>
               );
             })}

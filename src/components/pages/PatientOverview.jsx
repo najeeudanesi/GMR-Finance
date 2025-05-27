@@ -96,7 +96,7 @@ function PatientOverview() {
     <div className="w-full">
       <div className="mt-10">
         <div className="w-full">
-          <div className="w-full mt-5 underline-container flex items-center justify-between py-4">
+          <div className="m-t-80 flex space-between w-full mt-5 underline-container flex items-center justify-between py-4">
             <h2 className="text-xl font-semibold">Patient Payments</h2>
             <div className="flex items-center space-x-4">
               <SearchInput
@@ -116,13 +116,15 @@ function PatientOverview() {
             </div>
           </div>
 
-          <div className="flex justify-between w-full mt-10">
+          <div className="flex space-between w-full m-t-10">
             <div className="flex items-start gap-8 w-7/12">
               <img
                 src={
                   extraDetails?.pictureUrl ||
                   `https://cdn-icons-png.freepik.com/512/14026/14026766.png`
                 }
+                width={50}
+                height={50}
                 alt="Profile"
                 className="w-36 h-36 object-cover"
               />

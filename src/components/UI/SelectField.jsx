@@ -1,9 +1,9 @@
 import React from "react";
 
-function SelectField({ name, disabled, options, value, onChange }) {
+function SelectField({ name, disabled, options, value, onChange, label }) {
   return (
     <div className="flex flex-v-center m-t-10">
-      <div className="label text-sm text-green">{name}</div>
+      <div className="label text-sm text-green">{label}</div>
       <select
         disabled={disabled}
         className="input-field"

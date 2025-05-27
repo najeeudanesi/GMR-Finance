@@ -23,7 +23,6 @@ function PatientPaymentTable({ patientId }) {
   });
   const [paid, setpaid] = useState(0);
 
-
   const downloadFile = async (docName) => {
     try {
       // Get the token from local storage
@@ -74,7 +73,7 @@ function PatientPaymentTable({ patientId }) {
     }
   };
 
-  const handleUpdateModalOpen = (data,row) => {
+  const handleUpdateModalOpen = (data, row) => {
     setTopData(row);
     setIsUpdateModalOpen(true);
     setPaymentBreakdownData(data);
@@ -95,9 +94,13 @@ function PatientPaymentTable({ patientId }) {
   const fetchData = async () => {
     setIsLoading(true);
     try {
-      const response = await get(`/patientpayment/${patientId}`);
+      const response = await get(
+        `/patientpayment/list/1/10/patient/${patientId}/list-by-patient-id-and-total-debt`
+      );
 
-      setData([response]);
+      // const response = await get(`/patientpayment/${patientId}`);
+      console.log();
+      setData(response.resultList);
     } catch (e) {
       console.log(e);
     }
@@ -127,7 +130,7 @@ function PatientPaymentTable({ patientId }) {
             <thead className="border-top-none">
               <tr className="border-top-none">
                 <th className="w-10">Date</th>
-                <th>Service</th>
+                <th>Diagnosis</th>
                 <th className="w-60">Payment Breakdown</th>
                 <th>Deposit</th>
                 <th>Balance</th>
@@ -144,7 +147,7 @@ function PatientPaymentTable({ patientId }) {
                         <table className="w-100 no-bordered-table">
                           <thead>
                             <tr>
-                              <th>Category</th>
+                              <th>Service/Item</th>
                               <th>Total Cost</th>
                               <th>HMO Cover</th>
                               <th>HMO Due Pay</th>
@@ -159,7 +162,7 @@ function PatientPaymentTable({ patientId }) {
                           <tbody>
                             {row?.paymentBreakdowns.map((item, index) => (
                               <tr key={index}>
-                                <td>{item?.category?.name}</td>
+                                <td>{item?.serviceOrProductName}</td>
                                 <td>{item?.cost}</td>
                                 <td>{item?.hmoDuePay}</td>
                                 <td>{item?.hmoCover}</td>
@@ -172,8 +175,8 @@ function PatientPaymentTable({ patientId }) {
                                 >
                                   {item?.hmoBalance}
                                 </td>
-                                <td>{item?.duePay}</td> 
-                                <td>{row?.discountedAmount||0}</td>
+                                <td>{item?.duePay}</td>
+                                <td>{row?.discountedAmount || 0}</td>
                                 <td
                                   className={
                                     item.patientBalance > 0
@@ -181,13 +184,15 @@ function PatientPaymentTable({ patientId }) {
                                       : "zeroBalance"
                                   }
                                 >
-                                  {item?.patientBalance-row?.discountedAmount}
+                                  {item?.patientBalance - row?.discountedAmount}
                                 </td>
                                 <td>
                                   {" "}
                                   <button
                                     className="status-btn px-5"
-                                    onClick={() => handleUpdateModalOpen(item,row)}
+                                    onClick={() =>
+                                      handleUpdateModalOpen(item, row)
+                                    }
                                   >
                                     Update Payment
                                   </button>
@@ -219,7 +224,7 @@ function PatientPaymentTable({ patientId }) {
         <div>Loading....</div>
       )}
 
-      {isUpdateModalOpen &&
+      {isUpdateModalOpen && (
         <UpdateModal
           setpaid={setpaid}
           isOpen={isUpdateModalOpen}
@@ -232,7 +237,7 @@ function PatientPaymentTable({ patientId }) {
           paywithWallet={paywithWallet}
           setPaywithWallet={setPaywithWallet}
         />
-      }
+      )}
 
       {modalOpen && (
         <ImmunizationAttachment closeModal={toggleModal} data={attachments} />
