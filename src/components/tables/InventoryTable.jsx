@@ -28,7 +28,7 @@ function InventoryTable() {
       const data = await get(`/pharmacyinventory/list/${page}/${size}`);
       setInventoryData(data.resultList);
       setFilteredData(data.resultList); // Set filtered data initially
-      setTotalPages(data.totalPages);
+      setTotalPages(data?.paginationMetadata?.totalPages);
     } catch (e) {
       console.log("Error fetching inventory data:", e);
     }
@@ -40,7 +40,7 @@ function InventoryTable() {
     try {
       await del(`/pharmacyinventory/${itemId}`);
       toast.success("Item Deleted Successfully");
-      fetchInventoryData();
+      fetchInventoryData(currentPage, pageSize); // Refresh the inventory data after deletion
     } catch (error) {
       const errorData = await error?.response?.json();
       toast.error(errorData?.ErrorData[0] || "Failed to delete Item");
@@ -115,10 +115,11 @@ function InventoryTable() {
                 <th>Item</th>
                 <th>Inventory Id</th>
                 <th>Manufacturer</th>
-                <th>Stored Quantity</th>
-                <th>Available Quantity</th>
+                <th>Bulk Quantity</th>
+                <th>Dispense Quantity</th>
                 <th>Supplier</th>
                 <th>Inventory Number</th>
+                <th>Expiry Date</th>
                 <th>Action Taken</th>
                 <th>Actions</th>
               </tr>
@@ -127,12 +128,13 @@ function InventoryTable() {
               {filteredData?.map((row, index) => (
                 <tr key={index}>
                   <td>{row.productName}</td>
-                  <td>{row.categoryId}</td>
+                  <td>{row.inventoryNumber}</td>
                   <td>{row.manufacturer}</td>
                   <td>{row.storedQuantity}</td>
                   <td>{row.availableQuantity}</td>
                   <td>{row.supplier}</td>
                   <td>{row.inventoryNumber}</td>
+                  <td>{row.bestBefore}</td>
                   <td>{row.actionTaken}</td>
                   <td className="w-7"> <div className="underline flex gap2">
                     <img src={edit} alt="" onClick={() => stageData(row)} className="pointer" />
@@ -177,6 +179,7 @@ function InventoryTable() {
         <ConfirmationModal
           closeModal={() => setIsModalOpen(false)}
           confirmAction={confirmDelete}
+          currentPage={currentPage}
           message="Are you sure you want to delete this InventoryItem?"
         />
       )}

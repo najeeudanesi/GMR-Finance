@@ -1,32 +1,18 @@
 import React, { useEffect, useState } from "react";
 import { RiCloseFill } from "react-icons/ri";
 import InputField from "../UI/InputField";
-import { get, post } from "../../utility/fetch";
+import { get, post, put } from "../../utility/fetch";
 import toast from "react-hot-toast";
 
-function AddCost({ closeModal, fetchData }) {
+function AddCost({ closeModal, fetchData, modalData, currentPage }) {
   const [carePlan, setCarePlan] = useState("");
-
-  const [itemName, setitemName] = useState("");
+  const [itemName, setItemName] = useState("");
   const [loading, setLoading] = useState(false);
   const [itemId, setItemId] = useState("");
   const [unitCost, setUnitCost] = useState("");
-  const [categories, setcategories] = useState([]);
-  const [servicecategories, setServicecategories] = useState([
-    {
-      name: "Bed",
-      id: 1,
-    },
-    { name: "Equipment", id: 2 },
-    { name: "Other Services", id: 3 },
-  ]);
-  const [selectedCategoryId, setSelectedCategoryId] = useState('');
+  const [categories, setCategories] = useState([]);
+  const [selectedCategoryId, setSelectedCategoryId] = useState("");
   const [serviceId, setServiceId] = useState("");
-
-  const [itemNameError, setItemNameError] = useState(null);
-  const [itemIdError, setItemIdError] = useState(null);
-  const [unitCostError, setUnitCostError] = useState(null);
-  const [generalError, setGeneralError] = useState(null);
 
   const [EquipmentServicecategories, setEquipmentServicecategories] = useState(
     []
@@ -34,10 +20,26 @@ function AddCost({ closeModal, fetchData }) {
   const [BedServicecategories, setBedServicecategories] = useState([]);
   const [OtherServicecategories, setOtherServicecategories] = useState([]);
 
+  useEffect(() => {
+    fetchTreatmentCategory();
+    fetchEquipmentServiceCategory();
+    fetchBedServiceCategory();
+    fetchOtherServiceCategory(modalData?.serviceId || 0);
+
+    // Populate form fields if modalData is provided (edit mode)
+    if (modalData) {
+      setSelectedCategoryId(modalData.category.id || "");
+      setServiceId(modalData.serviceId || "");
+      setUnitCost(modalData.unitCost || "");
+    }
+  }, [modalData]);
+
+  console.log("Modal Data: ", modalData);
+
   const fetchTreatmentCategory = async () => {
     try {
       const response = await get("/category/list/1/1000");
-      setcategories(response.resultList);
+      setCategories(response.resultList);
     } catch (error) {
       console.log(error);
     }
@@ -46,34 +48,26 @@ function AddCost({ closeModal, fetchData }) {
   const fetchEquipmentServiceCategory = async () => {
     try {
       const response = await get("/equipment/list/1/1000");
-      //   setEquipmentServicecategories
-      // setBedServicecategories
       setEquipmentServicecategories(response.resultList);
-      console.log(response.resultList);
-    } catch (error) {
-      console.log(error);
-    }
-  };
-  const fetchOtherServiceCategory = async (id) => {
-    // https://edogoverp.com/clinicapi/api/categoryitem/list/category/8/1/10
-    try {
-      const response = await get(`/categoryItem/list/category/${id}/1/1000`);
-      //   setEquipmentServicecategories
-      // setBedServicecategories
-      setOtherServicecategories(response.resultList);
-      console.log(response.resultList);
     } catch (error) {
       console.log(error);
     }
   };
 
-  const fetchBedServiceCategory = async (id) => {
+  const fetchOtherServiceCategory = async (id) => {
+    try {
+      const response = await get(`/categoryItem/list/category/${id}/1/1000`);
+      setOtherServicecategories(response.resultList);
+    } catch (error) {
+      setOtherServicecategories([]);
+      console.log(error);
+    }
+  };
+
+  const fetchBedServiceCategory = async () => {
     try {
       const response = await get("/bed/list/1/1000");
-      //   setEquipmentServicecategories
-      // setBedServicecategories
       setBedServicecategories(response.resultList);
-      console.log(response.resultList);
     } catch (error) {
       console.log(error);
     }
@@ -81,12 +75,6 @@ function AddCost({ closeModal, fetchData }) {
 
   const submit = async () => {
     setLoading(true);
-
-    // Clear previous errors
-    setItemNameError(null);
-    setItemIdError(null);
-    setUnitCostError(null);
-    setGeneralError(null);
 
     const payload = {
       isCategoryItem:
@@ -96,61 +84,38 @@ function AddCost({ closeModal, fetchData }) {
       isBed: selectedCategoryId == 8,
       isEquipment: selectedCategoryId == 9,
       serviceId: parseInt(serviceId),
-      categoryId: parseInt(selectedCategoryId) || 0,
-      // itemName: itemName,
       itemId: parseInt(serviceId) || 0,
-      // itemId: parseInt(Math.floor(Math.random() * 10000000)),
-
+      categoryId: parseInt(selectedCategoryId) || 0,
       unitCost: parseFloat(unitCost) || 0,
     };
 
-    console.log(payload);
-    setLoading(false);
-
-    // return;
-
     try {
-      const response = await post("/costsetup", payload);
-      toast.success("Item Added Successfully");
-      fetchData();
-      closeModal();
-    } catch (e) {
-      const errorData = await e.response?.json();
-      if (Array.isArray(errorData?.errorData)) {
-        errorData.errorData.forEach((errorMessage) => {
-          if (errorMessage.includes("Item Name")) {
-            setItemNameError(errorMessage);
-          } else if (errorMessage.includes("Item Id")) {
-            setItemIdError(errorMessage);
-          } else if (errorMessage.includes("Unit Cost")) {
-            setUnitCostError(errorMessage);
-          } else {
-            setGeneralError(errorMessage);
-          }
-        });
-      } else if (typeof errorData === "string") {
-        setGeneralError(errorData);
+      if (modalData) {
+        // Update existing cost
+        await put(`/costsetup/${modalData.id}`, {...payload, itemId: modalData.itemId});
+        toast.success("Cost updated successfully");
       } else {
-        setGeneralError("An unexpected error occurred.");
+        // Add new cost
+        await post("/costsetup", payload);
+        toast.success("Cost added successfully");
       }
+
+      fetchData(currentPage, 10); // Refresh the data in the parent component
+      closeModal();
+    } catch (error) {
+      console.error("Error submitting cost:", error);
       toast.error("Something went wrong");
     }
+
     setLoading(false);
   };
-
-  useEffect(() => {
-    fetchTreatmentCategory();
-    fetchEquipmentServiceCategory();
-    fetchBedServiceCategory();
-    fetchOtherServiceCategory();
-  }, []);
 
   return (
     <div className="overlay">
       <RiCloseFill className="close-btn pointer" onClick={closeModal} />
       <div className="modal-box max-w-600">
-        <div className="p-40">
-          <h3 className="bold-text">Add Item</h3>
+        <div className="p-20">
+          <h3 className="bold-text">{modalData ? "Edit Cost" : "Add Cost"}</h3>
           <div className="w-100 m-t-20 flex">
             <label htmlFor="category" className="label">
               Category
@@ -162,12 +127,9 @@ function AddCost({ closeModal, fetchData }) {
               onChange={(e) => {
                 setSelectedCategoryId(e.target.value);
                 fetchOtherServiceCategory(e.target.value);
-                
-                // setServiceId(1);
               }}
             >
-                <option value="select">Select Category</option>
-
+              <option value="">Select Category</option>
               {categories.map((category) => (
                 <option key={category.id} value={category.id}>
                   {category.name}
@@ -176,104 +138,24 @@ function AddCost({ closeModal, fetchData }) {
             </select>
           </div>
 
-          {/* <div className="w-100 m-t-20 flex">
-            <label htmlFor="category" className="label">
-              Service Category
+          <div className="w-100 m-t-20 flex">
+            <label htmlFor="serviceId" className="label">
+              Service
             </label>
             <select
-              id="serviceCategories"
+              id="serviceId"
               className="input-field"
-              value={selectedServiceCategoryId}
-              onChange={(e) => setSelectedServiceCategoryId(e.target.value)}
+              value={serviceId}
+              onChange={(e) => setServiceId(e.target.value)}
             >
-              {servicecategories.map((category) => (
+              <option value="">Select Service</option>
+              {OtherServicecategories.map((category) => (
                 <option key={category.id} value={category.id}>
-                  {category.name}
+                  {category.itemName}
                 </option>
               ))}
             </select>
-          </div> */}
-
-          {selectedCategoryId == 8 ? (
-            <div className="w-100 m-t-20 flex">
-              <label htmlFor="category" className="label">
-                Bed Services
-              </label>
-
-              <select
-                id="serviceId"
-                className="input-field"
-                value={serviceId}
-                onChange={(e) => setServiceId(e.target.value)}
-              >
-                <option value="select">Select Service</option>
-
-                {BedServicecategories.map((category) => (
-                  <option key={category.id} value={category.id}>
-                    {category.name}
-                  </option>
-                ))}
-              </select>
-            </div>
-          ) : selectedCategoryId == 9 ? (
-            <div className="w-100 m-t-20 flex">
-              <label htmlFor="category" className="label">
-                Equipment Services
-              </label>
-
-              <select
-                id="serviceId"
-                className="input-field"
-                value={serviceId}
-                onChange={(e) => setServiceId(e.target.value)}
-              >
-                <option value="select">Select Service</option>
-                {EquipmentServicecategories.map((category) => (
-                  <option key={category.id} value={category.id}>
-                    {category.name}
-                  </option>
-                ))}
-              </select>
-            </div>
-          ) : (
-            <div className="w-100 m-t-20 flex">
-              <label htmlFor="" className="label">
-                {categories?.find((cat)=>cat.id == selectedCategoryId)?.name }
-              </label>
-
-              <select
-                id="serviceId"
-                className="input-field"
-                value={serviceId}
-                onChange={(e) => setServiceId(e.target.value)}
-              >
-                <option value="select">Select Service</option>
-
-                {OtherServicecategories.map((category) => (
-                  <option key={category.id} value={category.id}>
-                    {category.itemName}
-                  </option>
-                ))}
-              </select>
-            </div>
-          )}
-
-          {/* <InputField
-            label="Item Name"
-            value={itemName}
-            onChange={(e) => setitemName(e.target.value)}
-          />
-          {itemNameError && (
-            <span className="error-message">{itemNameError}</span>
-          )} */}
-
-          {/* <InputField
-            label="Item #ID"
-            value={itemId}
-            onChange={(e) => setItemId(e.target.value)}
-            type="number"
-          />
-          {itemIdError && <span className="error-message">{itemIdError}</span>} */}
+          </div>
 
           <InputField
             label="Unit Cost"
@@ -281,20 +163,13 @@ function AddCost({ closeModal, fetchData }) {
             onChange={(e) => setUnitCost(e.target.value)}
             type="number"
           />
-          {unitCostError && (
-            <span className="error-message">{unitCostError}</span>
-          )}
-
-          {generalError && (
-            <span className="error-message">{generalError}</span>
-          )}
 
           <button
             className="btn m-t-20 w-100"
             onClick={submit}
             disabled={loading}
           >
-            Continue
+            {modalData ? "Update" : "Add"}
           </button>
         </div>
       </div>

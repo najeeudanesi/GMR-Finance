@@ -9,6 +9,7 @@ function PatientPaymentTable({ patientId }) {
   const [modalOpen, setModalOpen] = useState(false);
   const [attachments, setAttachments] = useState([]);
   const [data, setData] = useState([]);
+  const [topData, setTopData] = useState([]);
   const [isloading, setIsLoading] = useState(false);
   const [isUpdateModalOpen, setIsUpdateModalOpen] = useState(false);
   const [paymentBreakdownData, setPaymentBreakdownData] = useState(null);
@@ -73,8 +74,8 @@ function PatientPaymentTable({ patientId }) {
     }
   };
 
-  const handleUpdateModalOpen = (data) => {
-    console.log(data);
+  const handleUpdateModalOpen = (data,row) => {
+    setTopData(row);
     setIsUpdateModalOpen(true);
     setPaymentBreakdownData(data);
   };
@@ -126,7 +127,7 @@ function PatientPaymentTable({ patientId }) {
             <thead className="border-top-none">
               <tr className="border-top-none">
                 <th className="w-10">Date</th>
-                <th>Service</th>
+                <th>Diagnosis</th>
                 <th className="w-60">Payment Breakdown</th>
                 <th>Deposit</th>
                 <th>Balance</th>
@@ -143,13 +144,14 @@ function PatientPaymentTable({ patientId }) {
                         <table className="w-100 no-bordered-table">
                           <thead>
                             <tr>
-                              <th>Category</th>
+                              <th>Service/Item</th>
                               <th>Total Cost</th>
                               <th>HMO Cover</th>
                               <th>HMO Due Pay</th>
                               <th>HMO Balance</th>
 
                               <th>Patient Due Pay</th>
+                              <th>Discounted Amount</th>
                               <th>Patient Balance</th>
                               <th>Action</th>
                             </tr>
@@ -157,7 +159,7 @@ function PatientPaymentTable({ patientId }) {
                           <tbody>
                             {row?.paymentBreakdowns.map((item, index) => (
                               <tr key={index}>
-                                <td>{item?.category?.name}</td>
+                                <td>{item?.serviceOrProductName}</td>
                                 <td>{item?.cost}</td>
                                 <td>{item?.hmoDuePay}</td>
                                 <td>{item?.hmoCover}</td>
@@ -170,7 +172,8 @@ function PatientPaymentTable({ patientId }) {
                                 >
                                   {item?.hmoBalance}
                                 </td>
-                                <td>{item?.duePay}</td>
+                                <td>{item?.duePay}</td> 
+                                <td>{row?.discountedAmount||0}</td>
                                 <td
                                   className={
                                     item.patientBalance > 0
@@ -178,25 +181,25 @@ function PatientPaymentTable({ patientId }) {
                                       : "zeroBalance"
                                   }
                                 >
-                                  {item?.patientBalance}
+                                  {item?.patientBalance-row?.discountedAmount}
                                 </td>
                                 <td>
                                   {" "}
                                   <button
                                     className="status-btn px-5"
-                                    onClick={() => handleUpdateModalOpen(item)}
+                                    onClick={() => handleUpdateModalOpen(item,row)}
                                   >
                                     Update Payment
                                   </button>
                                 </td>
-                                <td>
+                                {/* <td>
                                   <button
                                     className="status-btn px-5"
-                                    onClick={() => { handleUpdateModalOpen(item); setPaywithWallet(true) }}
+                                    onClick={() => { handleUpdateModalOpen(item,row); setPaywithWallet(true) }}
                                   >
                                     Pay From Wallet
                                   </button>
-                                </td>
+                                </td> */}
                               </tr>
                             ))}
                           </tbody>
@@ -222,10 +225,12 @@ function PatientPaymentTable({ patientId }) {
           isOpen={isUpdateModalOpen}
           onClose={handleUpdateModalClose}
           paymentBreakdownData={paymentBreakdownData}
+          topData={topData}
           amountOwed={paymentBreakdownData?.patientBalance}
           patientId={paymentBreakdownData?.patient?.id}
           patientPaymentId={paymentBreakdownData?.id}
           paywithWallet={paywithWallet}
+          setPaywithWallet={setPaywithWallet}
         />
       }
 

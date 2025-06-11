@@ -34,6 +34,8 @@ const Home = (props) => {
 
       sessionStorage.setItem('token', "Bearer " + data?.resultList?.token);
       sessionStorage.setItem('token-expiry-date', data?.resultList?.expirationDate)
+      localStorage.setItem("homeLink", data?.resultList?.homeLink);
+
       localStorage.setItem('name', (data?.resultList?.firstName || "user") + " " + (data?.resultList?.lastName || "name"));
       localStorage.setItem('role', data?.resultList?.role || "Finance Admin");
       localStorage.setItem('userId', data?.resultList?.userId)

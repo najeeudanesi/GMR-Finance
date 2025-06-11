@@ -11,11 +11,13 @@ function UpdateModal({
   isOpen,
   onClose,
   patientId,
+  topData,
   patientPaymentId,
   amountOwed,
   setpaid,
   paymentBreakdownData,
   paywithWallet,
+  setPaywithWallet,
 }) {
   const [currentTime, setCurrentTime] = useState(new Date());
   const [outstandingPayments, setOutstandingPayments] = useState(null);
@@ -34,9 +36,7 @@ function UpdateModal({
   const [loading, setLoading] = useState(false);
   const navigate = useNavigate();
 
-  console.log(paymentBreakdownData?.patientId);
-
-  
+  console.log(topData);
 
   useEffect(() => {
     if (paymentBreakdownData) {
@@ -49,12 +49,12 @@ function UpdateModal({
         comment: "",
       });
     }
-  }, [paymentBreakdownData]);
+  }, [paymentBreakdownData, ]);
 
   useEffect(() => {
     setFormData((prevData) => ({
       ...prevData,
-      availableBalance: (prevData.amountOwed || 0) - (prevData.amountPaid || 0),
+      availableBalance: (topData?.patientTotalBalance) - (prevData.amountPaid || 0),
       amountOwed:
         formData?.amountPayableBy === "Patient"
           ? paymentBreakdownData?.patientBalance
@@ -63,15 +63,17 @@ function UpdateModal({
   }, [formData.amountPaid, formData.amountOwed, formData.amountPayableBy]);
 
   useEffect(() => {
-    if (paywithWallet) {
-      getAllPatientsOutstanding();
-    }
-  }, [paywithWallet]);
+    // if (paywithWallet) {
+    getAllPatientsOutstanding();
+    // }
+  }, [paywithWallet, formData.amountPayableBy]);
 
   const getAllPatientsOutstanding = async () => {
     setLoading(true);
     try {
-      let res = await get(`/patientpayment/list/1/10000/patient/${paymentBreakdownData?.patientId}/list-by-patient-id-and-total-debt`);
+      let res = await get(
+        `/patientpayment/list/1/10000/patient/${paymentBreakdownData?.patientId}/list-by-patient-id-and-total-debt`
+      );
       setOutstandingPayments(res?.resultList ? res?.resultList : null);
     } catch (error) {
       setOutstandingPayments(null);
@@ -92,19 +94,23 @@ function UpdateModal({
   };
 
   const handleWalletChange = (e, name) => {
-    if (name === 'paymentsMade') {
-      const selectedOptions = e.map(option => ({
+    if (name === "paymentsMade") {
+      const selectedOptions = e.map((option) => ({
         paymentBreakdownId: option.value,
-        transactionPurpose: payload.transactionPurpose
+        transactionPurpose: payload.transactionPurpose,
       }));
       setPayload({ ...payload, paymentsMade: selectedOptions });
-    } else if (name === 'transactionPurpose') {
+    } else if (name === "transactionPurpose") {
       const value = e.target.value;
-      const updatedPaymentsMade = payload.paymentsMade.map(payment => ({
+      const updatedPaymentsMade = payload.paymentsMade.map((payment) => ({
         ...payment,
-        transactionPurpose: value
+        transactionPurpose: value,
       }));
-      setPayload({ ...payload, transactionPurpose: value, paymentsMade: updatedPaymentsMade });
+      setPayload({
+        ...payload,
+        transactionPurpose: value,
+        paymentsMade: updatedPaymentsMade,
+      });
     }
   };
 
@@ -155,7 +161,7 @@ function UpdateModal({
     }
 
     let data = {
-      paymentsMade: payload.paymentsMade.map(payment => ({
+      paymentsMade: payload.paymentsMade.map((payment) => ({
         paymentBreakdownId: payment.paymentBreakdownId,
         transactionPurpose: payment.transactionPurpose,
       })),
@@ -163,7 +169,7 @@ function UpdateModal({
 
     try {
       const response = await put(
-        `/depositwallet/patient/${(formData?.patientId)}/patient-cover-bill`,
+        `/depositwallet/patient/${formData?.patientId}/patient-cover-bill`,
         data
       );
 
@@ -172,8 +178,12 @@ function UpdateModal({
 
       onClose(); // Close the modal on successful submission
     } catch (e) {
+      console.log(e);
       const errMessage = await e.response?.json();
-      toast.error(errMessage?.errorData[0] || "Something went wrong");
+      console.log(errMessage);
+      toast.error(
+        (errMessage && errMessage?.ErrorData[0]) || "Something went wrong"
+      );
     } finally {
       setLoading(false);
     }
@@ -188,10 +198,16 @@ function UpdateModal({
           <div className="flex justify-between items-center mb-4">
             <h3 className="bold-text">Make payment For Services</h3>
             <RiCloseFill className="close-btn pointer" onClick={onClose} />
-            
           </div>
-          <form onSubmit={paywithWallet ? handlePaymentFromWallet : handleSubmit} className="m-t-20">
-            {!paywithWallet && (
+          <form
+            onSubmit={
+              paywithWallet || formData.amountPayableBy == "wallet"
+                ? handlePaymentFromWallet
+                : handleSubmit
+            }
+            className="m-t-20"
+          >
+            {!paywithWallet && formData.amountPayableBy !== "wallet" && (
               <>
                 <div className="flex">
                   {" "}
@@ -205,8 +221,9 @@ function UpdateModal({
                     required
                     className="input-field"
                   >
-                    <option value="patient">Patient</option>
+                    <option value="Patient">Patient</option>
                     <option value="HMO">HMO</option>
+                    <option value="wallet">Pay FRom Wallet</option>
                   </select>
                 </div>
 
@@ -214,6 +231,14 @@ function UpdateModal({
                   label="Amount Owed"
                   name="amountOwed"
                   value={formData.amountOwed}
+                  onChange={handleChange}
+                  type="number"
+                  disabled
+                />
+                 <InputField
+                  label="Discounted Amount"
+                  name="amountOwed"
+                  value={topData.discountedAmount||0}
                   onChange={handleChange}
                   type="number"
                   disabled
@@ -226,7 +251,7 @@ function UpdateModal({
                   type="number"
                   required
                 />
-                
+
                 <InputField
                   label="Available Balance"
                   name="availableBalance"
@@ -245,24 +270,41 @@ function UpdateModal({
               </>
             )}
 
-            {paywithWallet && (
-              <div className="flex">
-                <div className="w-100 m-t-10 ">
-                  <TagInputs
-                    label="Select Bill"
-                    options={outstandingPayments?.map(payment => ({
-                      value: payment.paymentBreakdowns[0]?.id,
-                      label: `${payment.paymentBreakdowns[0]?.serviceOrProductName} - ${payment.paymentBreakdowns[0]?.cost}`
-                    }))}
-                    name='paymentsMade'
-                    onChange={(e) => handleWalletChange(e, 'paymentsMade')}
-                    type='R-select'
-                    isMulti={true}
-                  />
-                  <TagInputs label="Purpose Of Transaction" name="transactionPurpose" value={payload?.transactionPurpose} onChange={(e) => handleWalletChange(e, 'transactionPurpose')} type='textArea' />
+            {paywithWallet ||
+              (formData.amountPayableBy == "wallet" && (
+                <div className="flex">
+                  <div className="w-100 m-t-10 ">
+                    <div
+                      className="btn w-10"
+                      onClick={() =>
+                        setFormData({ ...formData, amountPayableBy: "Patient" })
+                      }
+                    >
+                      Back
+                    </div>
+                    <TagInputs
+                      label="Select Bill"
+                      options={outstandingPayments?.map((payment) => ({
+                        value: payment.paymentBreakdowns[0]?.id,
+                        label: `${payment.paymentBreakdowns[0]?.serviceOrProductName} - ${payment.paymentBreakdowns[0]?.cost}`,
+                      }))}
+                      name="paymentsMade"
+                      onChange={(e) => handleWalletChange(e, "paymentsMade")}
+                      type="R-select"
+                      isMulti={true}
+                    />
+                    <TagInputs
+                      label="Purpose Of Transaction"
+                      name="transactionPurpose"
+                      value={payload?.transactionPurpose}
+                      onChange={(e) =>
+                        handleWalletChange(e, "transactionPurpose")
+                      }
+                      type="textArea"
+                    />
+                  </div>
                 </div>
-              </div>
-            )}
+              ))}
             <button
               type="submit"
               className="btn m-t-20 w-100"

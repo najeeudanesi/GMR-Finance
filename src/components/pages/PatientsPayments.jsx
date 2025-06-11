@@ -118,6 +118,7 @@ function PatientsPayments() {
               <img
                 src={downloadImg}
                 alt={downloadImg}
+                
                 className="w-full h-full object-cover rounded-full"
               />
             </div>

@@ -28,7 +28,7 @@ function CreateHmo() {
         try {
             const data = await get(`/hmo/list/${page}/${size}`);
             setHmoData(data.resultList); // Adjust this based on the actual response structure
-            setTotalPages(data.totalPages); // Set total pages from response
+            setTotalPages(data?.paginationMetadata?.totalPages); // Set total pages from response
         } catch (e) {
             console.error("Error fetching HMO data: ", e);
         }

@@ -6,6 +6,7 @@ import toast from "react-hot-toast";
 import Cookies from "js-cookie";
 import TagInputs from "../UI/TagInputs";
 import PayForAnother from "./PayForAnother";
+import SpeechToTextButton from "../UI/SpeechToTextButton";
 
 function MakeDeposit({ closeModal, }) {
     const [loading, setLoading] = useState(false); const [OtherServicecategories, setOtherServicecategories] = useState([]);
@@ -42,6 +43,10 @@ function MakeDeposit({ closeModal, }) {
         setPayload({ ...payload, [name]: value });
     }
 
+    const handleTranscript = (transcript) => {
+        setPayload(prevPayload => ({ ...prevPayload, transactionPurpose: prevPayload.transactionPurpose ? prevPayload.transactionPurpose + ' ' + transcript : transcript }));
+    };
+
     return (
         <div className="overlay">
             <RiCloseFill className="close-btn pointer" onClick={closeModal} />
@@ -68,6 +73,8 @@ function MakeDeposit({ closeModal, }) {
                     <div className="w-100 m-t-10 flex">
                         <TagInputs label="Purpose Of Transaction" name="transactionPurpose" value={payload?.transactionPurpose} onChange={(e) => handleChange(e, 'transactionPurpose')} type='textArea' />
                     </div>
+                    <SpeechToTextButton onTranscript={handleTranscript} />
+
 
 
                     <button

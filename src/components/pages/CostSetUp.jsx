@@ -29,7 +29,7 @@ function CostSetUp() {
       const data = await get(`/costsetup/list/${page}/${size}`);
       setCostData(data.resultList);
       setFilteredData(data.resultList);
-      setTotalPages(data.totalPages);
+      setTotalPages(data?.paginationMetadata?.totalPages);
     } catch (e) {
       console.log("Error: ", e);
     }
@@ -83,15 +83,12 @@ function CostSetUp() {
   };
 
   return (
-    <div className="w-full m-t-80 p-20">
+    <div className="w-100 m-t-80 p-20">
       <div>
         <h3 className="mb-3 font-semibold">Item Pricing (Product/Service/Others)</h3>
-        <div className="flex justify-end w-full">
-          <div className="flex items-center space-x-4 w-[70%]">
-            <div className="flex-grow">
-              <SearchInput type="text" onChange={handleSearchChange} value={searchText} name="searchText" />
-            </div>
-            <div className="w-20">
+        <div className="flex space-between">
+          <div className="flex  col-6">
+            <div className="m-r-10">
               <SortInput
                 value={sortBy}
                 onChange={handleSortChange}
@@ -99,8 +96,11 @@ function CostSetUp() {
                 placeholder="Sort by"
               />
             </div>
-            <button className="btn w-40" onClick={() => setModal(true)}>+ Add Item</button>
+            <div className="flex-grow">
+              <SearchInput type="text" onChange={handleSearchChange} value={searchText} name="searchText" />
+            </div>
           </div>
+          <button className="btn w-40" onClick={() => setModal(true)}>+ Add Item</button>
         </div>
         {!loading ? (
           <div>

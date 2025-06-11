@@ -19,7 +19,9 @@ function CostSetUp() {
   const [sortBy, setSortBy] = useState("");
 
   const sortOptions = [
-    { value: "name", label: "Name" }
+    { value: "IsCategoryItem", label: "Item Name" },
+    { value: "IsBed", label: "Bed Name" },
+    { value: "IsEquipment", label: "Equipment Name" },
   ];
 
 
@@ -30,7 +32,7 @@ function CostSetUp() {
       const data = await get(`/costsetup/list/${page}/${size}`);
       setCostData(data.resultList);
       setFilteredData(data.resultList);
-      setTotalPages(data.totalPages);
+      setTotalPages(data?.paginationMetadata?.totalPages);
       console.log(data);
     } catch (e) {
       console.log("Error: ", e);
@@ -45,7 +47,7 @@ function CostSetUp() {
     try {
       const data = await get(`/costsetup/filter-list/${filterOn}/${filterQuery}/${page}/${size}`);
       setFilteredData(data.resultList);
-      setTotalPages(data.totalPages);
+      setTotalPages(data?.paginationMetadata?.totalPages);
       console.log(data);
     } catch (e) {
       console.log("Error: ", e);
@@ -61,7 +63,7 @@ function CostSetUp() {
     if (searchText === "") {
       await getTableData(currentPage, pageSize);
     } else {
-      await getFilteredData("ItemName", searchText, currentPage, pageSize);
+      await getFilteredData(sortBy, searchText, currentPage, pageSize);
     }
     setLoading(false);
   };
@@ -72,7 +74,7 @@ function CostSetUp() {
     }, 300);
 
     return () => clearTimeout(delayDebounceFn);
-  }, [searchText, currentPage, pageSize]);
+  }, [searchText, currentPage, pageSize, sortBy]);
 
   const handleSearchChange = (event) => {
     setSearchText(event.target.value);
@@ -84,29 +86,28 @@ function CostSetUp() {
   };
 
   return (
-    <div className="w-full m-t-80 p-20">
+    <div className="w-100 m-t-80 p-20">
       <div >
         <h3 className="mb-3 font-semibold">Item Pricing (Product/Service/Others)</h3>
-        <div className="flex justify-end w-full">
-          <div className="flex items-center space-x-4 w-[70%]">
-            <div className="flex-grow">
+        <div className="flex space-between">
+          <div className="flex  space-between">
+            <div className="m-r-10 w-100">
               <SearchInput type="text" onChange={handleSearchChange} value={searchText} name="searchText" />
             </div>
-            <div className="w-20">
-              <SortInput
+            <SortInput
               value={sortBy}
               onChange={handleSortChange}
               options={sortOptions}
               placeholder="Sort by"
-              />
-            </div>
-            <button className="btn w-40" onClick={() => setModal(true)}>+ Add Item</button>
+            />
+
           </div>
+          <button className="btn w-40" onClick={() => setModal(true)}>+ Add Item</button>
         </div>
         {!loading ? (
           <div>
             <div className="">
-              <CostTable data={filteredData} />
+              <CostTable data={filteredData} fetch={getTableData} currentPage={currentPage} />
             </div>
             <div className="m-t-20 flex flex-h-end">
               <Pagination
@@ -121,7 +122,7 @@ function CostSetUp() {
           <div>loading....</div>
         )}
       </div>
-      {modal && <div> <AddCost closeModal={() => setModal(false)} fetchData={fetchData} /></div>}
+      {modal && <div> <AddCost closeModal={() => setModal(false)} fetchData={fetchData} currentPage={currentPage} /></div>}
     </div>
   );
 }

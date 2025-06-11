@@ -40,10 +40,11 @@ function ThresholdItemTable() {
                 <th>Item</th>
                 <th>Inventory Id</th>
                 <th>Manufacturer</th>
-                <th>Stored Quantity</th>
-                <th>Available Quantity</th>
+                <th>Bulk Quantity</th>
+                <th>Dispense Quantity</th>
                 <th>Supplier</th>
                 <th>Last Restock</th>
+                <th>Expiry Date</th>
                 <th>Action</th>
               </tr>
             </thead>
@@ -57,6 +58,8 @@ function ThresholdItemTable() {
                   <td>{row.availableQuantity}</td>
                   <td>{row.supplier}</td>
                   <td>{row.lastRestock}</td>
+                  <td>{row.bestBefore}</td>
+                  {/* Assuming you want to show an icon for action */}
                   <td><BsBank /></td>
                 </tr>
               ))}
