@@ -12,8 +12,8 @@ async function fetchBackend(endpoint, method, auth, body, params) {
   };
   const fetchObject = { method, headers };
   const path = paths[endpoint] || endpoint;
-  let url = `https://edogoverp.com/clinicapi/api${path}`;
-  // let url = `https://api.greenzonetechnologies.com.ng/clinicapi/api${path}`;
+  // let url = `https://edogoverp.com/clinicapi/api${path}`;
+  let url = `https://api.greenzonetechnologies.com.ng/clinicapi/api${path}`;
   
 
   if (body) {

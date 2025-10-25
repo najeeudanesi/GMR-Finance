@@ -1,9 +1,14 @@
 import React, { useEffect, useState } from "react";
 import ImmunizationAttachment from "../modals/ImmunizationAttachments";
 import { formatDate } from "../../utility/general";
-import { get } from "../../utility/fetch";
+import { get, del } from "../../utility/fetch";
 import toast from "react-hot-toast";
 import UpdateModal from "../modals/UpdateModal";
+import GiveDiscountModal from "../modals/GiveDiscountModal";
+// ...existing code...
+
+// ...existing code...
+// Delete payment breakdown by id
 
 function PatientPaymentTable({ patientId }) {
   const [modalOpen, setModalOpen] = useState(false);
@@ -12,6 +17,8 @@ function PatientPaymentTable({ patientId }) {
   const [topData, setTopData] = useState([]);
   const [isloading, setIsLoading] = useState(false);
   const [isUpdateModalOpen, setIsUpdateModalOpen] = useState(false);
+  const [isGiveDiscountOpen, setIsGiveDiscountOpen] = useState(false);
+
   const [paymentBreakdownData, setPaymentBreakdownData] = useState(null);
   const [paywithWallet, setPaywithWallet] = useState(false);
   const [updateFormData, setUpdateFormData] = useState({
@@ -95,7 +102,7 @@ function PatientPaymentTable({ patientId }) {
     setIsLoading(true);
     try {
       const response = await get(
-        `/patientpayment/list/1/10/patient/${patientId}/list-by-patient-id-and-total-debt`
+        `/patientpayment/list/1/1000/patient/${patientId}/list-by-patient-id-and-total-debt`
       );
 
       // const response = await get(`/patientpayment/${patientId}`);
@@ -111,6 +118,19 @@ function PatientPaymentTable({ patientId }) {
   console.log(patientId);
   const toggleModal = () => {
     setModalOpen(!modalOpen);
+  };
+
+  const handleDeletePayment = async (paymentBreakdownId) => {
+    if (!window.confirm("Are you sure you want to delete this payment?"))
+      return;
+    try {
+      await del(`/patientpayment/deletepayment?id=${paymentBreakdownId}`);
+      toast.success("Payment deleted successfully");
+      fetchData();
+    } catch (e) {
+      toast.error("Failed to delete payment");
+      console.error(e);
+    }
   };
 
   const stageAttachments = (data) => {
@@ -132,8 +152,8 @@ function PatientPaymentTable({ patientId }) {
                 <th className="w-10">Date</th>
                 <th>Diagnosis</th>
                 <th className="w-60">Payment Breakdown</th>
-                <th>Deposit</th>
-                <th>Balance</th>
+                {/* <th>Deposit</th>
+                <th>Balance</th> */}
               </tr>
             </thead>
             <tbody className="white-bg view-det-pane">
@@ -155,7 +175,8 @@ function PatientPaymentTable({ patientId }) {
 
                               <th>Patient Due Pay</th>
                               <th>Discounted Amount</th>
-                              <th>Patient Balance</th>
+                              {/* <th>Patient Balance</th> */}
+                              <th>Patient to pay</th>
                               <th>Action</th>
                             </tr>
                           </thead>
@@ -176,7 +197,7 @@ function PatientPaymentTable({ patientId }) {
                                   {item?.hmoBalance}
                                 </td>
                                 <td>{item?.duePay}</td>
-                                <td>{row?.discountedAmount || 0}</td>
+                                <td>{item.cost - item?.discountedAmount || 0}</td>
                                 <td
                                   className={
                                     item.patientBalance > 0
@@ -184,18 +205,48 @@ function PatientPaymentTable({ patientId }) {
                                       : "zeroBalance"
                                   }
                                 >
-                                  {item?.patientBalance - row?.discountedAmount}
+                                  {item?.patientBalance}
                                 </td>
                                 <td>
-                                  {" "}
-                                  <button
-                                    className="status-btn px-5"
-                                    onClick={() =>
-                                      handleUpdateModalOpen(item, row)
-                                    }
-                                  >
-                                    Update Payment
-                                  </button>
+                                  <div className="flex">
+                                    <button
+                                      className="status-btn px-5"
+                                      onClick={() =>
+                                        handleUpdateModalOpen(item, row)
+                                      }
+                                    >
+                                      Update Payment
+                                    </button>
+                                    <button
+                                      className="status-btn px-5"
+                                      style={{
+                                        background: "#f6ad55",
+                                        color: "#222",
+                                        marginLeft: 6,
+                                      }}
+                                      onClick={() => {
+                                        setTopData(row);
+                                        setPaymentBreakdownData(item);
+                                        setIsGiveDiscountOpen(true);
+                                      }}
+                                    >
+                                      Give Discount
+                                    </button>
+
+                                    <button
+                                      className="status-btn px-5"
+                                      style={{
+                                        background: "#e53e3e",
+                                        color: "white",
+                                        marginLeft: 6,
+                                      }}
+                                      onClick={() =>
+                                        handleDeletePayment(item.id)
+                                      }
+                                    >
+                                      Delete
+                                    </button>
+                                  </div>
                                 </td>
                                 {/* <td>
                                   <button
@@ -213,8 +264,8 @@ function PatientPaymentTable({ patientId }) {
                       </div>
                     )}
                   </td>
-                  <td>{row?.hmoDeposit}</td>
-                  <td>{row?.hmoBalance}</td>
+                  {/* <td>{row?.hmoDeposit}</td>
+                  <td>{row?.hmoBalance}</td> */}
                 </tr>
               ))}
             </tbody>
@@ -234,6 +285,22 @@ function PatientPaymentTable({ patientId }) {
           amountOwed={paymentBreakdownData?.patientBalance}
           patientId={paymentBreakdownData?.patient?.id}
           patientPaymentId={paymentBreakdownData?.id}
+          paywithWallet={paywithWallet}
+          setPaywithWallet={setPaywithWallet}
+        />
+      )}
+
+      {isGiveDiscountOpen && (
+        <GiveDiscountModal
+          isOpen={isGiveDiscountOpen}
+          onClose={() => setIsGiveDiscountOpen(false)}
+          patientId={patientId}
+          topData={topData}
+          depositBalance={topData?.patientTotalBalance}
+          patientPaymentId={topData?.id}
+          amountOwed={paymentBreakdownData?.patientBalance}
+          setpaid={setpaid}
+          paymentBreakdownData={paymentBreakdownData}
           paywithWallet={paywithWallet}
           setPaywithWallet={setPaywithWallet}
         />

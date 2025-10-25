@@ -16,9 +16,10 @@ function CostTable({ data, fetch, currentPage, pageSize }) {
     const navigate = useNavigate();
 
     const handleDelete = async (row) => {
+        console.log(row.id);
         // return;
         try {
-          const response = await del(`/categoryItem/${row.id}`);
+          const response = await del(`/costsetup/${row?.id}`);
           console.log(response);
           fetch();
         } catch (e) {

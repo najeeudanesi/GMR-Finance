@@ -12,7 +12,9 @@ async function fetchBackend(endpoint, method, auth, body, params) {
   };
   const fetchObject = { method, headers };
   const path = paths[endpoint] || endpoint;
-  let url = `https://edogoverp.com/medicals/api${path}`;
+  // let url = `https://edogoverp.com/medicals/api${path}`;
+  let url = `https://api.greenzonetechnologies.com.ng/medicals/api${path}`;
+
 
   if (body) {
     fetchObject.body = JSON.stringify(body);

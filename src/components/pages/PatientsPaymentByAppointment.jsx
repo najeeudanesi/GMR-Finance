@@ -12,6 +12,7 @@ import PatientsInvoiceTable from "../tables/PatientsInvoiceTable";
 
 function PatientsPaymentsByAppointment() {
   const [costData, setCostData] = useState([]);
+  const [searchData, setSearchData] = useState([]);
   const [loading, setLoading] = useState(false);
   const [currentPage, setCurrentPage] = useState(1);
   const [pageSize, setPageSize] = useState(10);
@@ -27,6 +28,7 @@ function PatientsPaymentsByAppointment() {
     { value: "ModifiedBy", label: "Modified By" },
   ];
 
+    
 
   const fetchData = useCallback(
     // Appointment/get-appointment-bypatientId/105?pageIndex=1&pageSize=10
@@ -34,20 +36,22 @@ function PatientsPaymentsByAppointment() {
       setLoading(true);
       try {
         let data;
-        data = await get(
-          `/patients/filter?pageIndex=${currentPage}&pageSize=${pageSize}&${filter}=${query}`
-        );
-        // if (filter && query) {
-        //   data = await get(
-        //     `/patients/filter/${filter}/${query}/${page}/${pageSize}`
-        //   );
-        // } else {
-        //   data = await get(
-        //     `/patients/list/${page}/${pageSize}/patient-payment-list`
-        //   );
-        // }
-        console.log(data)
-        setCostData(data.data || []);
+        // data = await get(
+        //   `/patients/allpatient/${localStorage.getItem("clinicId")}?pageIndex=${currentPage}&pageSize=${1000}`
+        // );
+        if (filter && query) {
+          data = await get(
+            `/patientpayment/filter-list/${filter}/${query}/${page}/${pageSize}`
+          );
+        } else {
+          data = await gets(
+            `/patient/patientswithtransactionlist`
+          );
+        }
+        console.log(data);
+        setCostData(data.resultList || []);
+        setSearchData(data.resultList || []);
+        
         setTotalPages(data.pageCount || 1);
       } catch (error) {
         setCostData([]);
@@ -58,7 +62,6 @@ function PatientsPaymentsByAppointment() {
     [currentPage]
   );
 
-
   const debouncedFetchData = useCallback(
     debounce((page, filter, query) => fetchData(page, filter, query), 150),
     [fetchData]
@@ -66,15 +69,18 @@ function PatientsPaymentsByAppointment() {
 
   useEffect(() => {
     debouncedFetchData(currentPage, sortBy, searchText);
-  }, [currentPage, sortBy, searchText, debouncedFetchData]);
+  }, [currentPage, sortBy, debouncedFetchData]);
 
   const handleSearchChange = (event) => {
     setSearchText(event.target.value);
+    setCostData(searchData.filter(item => item.firstName.toLowerCase().includes(event.target.value.toLowerCase())));
+
+    // setSearchData(event.target.value);
   };
 
   const handleSortChange = (event) => {
     setSortBy(event.target.value);
-    console.log()
+    console.log();
   };
 
   const handlePageChange = (page) => {
@@ -99,10 +105,8 @@ function PatientsPaymentsByAppointment() {
     return pages;
   };
 
-
   return (
     <div className="w-100 m-t-80 p-20">
-
       <div className="items-center">
         <div className="flex flex-v-center w-100 space-between">
           <h3 className="font-semibold">Patients Management</h3>
@@ -113,16 +117,17 @@ function PatientsPaymentsByAppointment() {
                 onChange={handleSearchChange}
                 value={searchText}
                 name="searchText"
+                placeholder="Search by firstname"
               />
             </div>
-            <div className="w-50">
+            {/* <div className="w-50">
               <SortInput
                 value={sortBy}
                 onChange={handleSortChange}
                 options={sortOptions}
                 placeholder="Sort by"
               />
-            </div>
+            </div> */}
             <div className="w-13 h-13 rounded-full bg-green-300 flex items-center justify-center p-3 border border-green-700">
               <img
                 src={downloadImg}
@@ -132,20 +137,25 @@ function PatientsPaymentsByAppointment() {
             </div>
           </div>
         </div>
-        {loading ? <div className="m-t-20">Loading...</div> : (<> <div className="">
-          <PatientsInvoiceTable data={costData} />
-        </div>
-          <div className="m-t-20 flex flex-h-end">
-            <Pagination
-              currentPage={currentPage}
-              totalPages={totalPages}
-              handlePageChange={handlePageChange}
-              generatePageNumbers={generatePageNumbers}
-            />
-          </div></>)}
-
+        {loading ? (
+          <div className="m-t-20">Loading...</div>
+        ) : (
+          <>
+            {" "}
+            <div className="">
+              <PatientsInvoiceTable data={costData} />
+            </div>
+            <div className="m-t-20 flex flex-h-end">
+              <Pagination
+                currentPage={currentPage}
+                totalPages={totalPages}
+                handlePageChange={handlePageChange}
+                generatePageNumbers={generatePageNumbers}
+              />
+            </div>
+          </>
+        )}
       </div>
-
     </div>
   );
 }

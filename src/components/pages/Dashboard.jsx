@@ -143,10 +143,10 @@ function Dashboard() {
   const fetchData = async () => {
     setLoading(true);
     await getAssigned();
-    await getHmoContribution();
+    // await getHmoContribution();
     await getHmoPatients();
-    await getOutStandingPatients();
-    await getDirectRevenue();
+    // await getOutStandingPatients();
+    // await getDirectRevenue();
     await getGraphDetails();
     await getGender();
     setLoading(false)

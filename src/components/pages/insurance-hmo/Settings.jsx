@@ -9,6 +9,7 @@ import {
 import Pagination from "../../UI/Pagination";
 import CategoriesTable from "../../tables/CategoriesTable";
 import ServiceTable from "../../tables/ServiceTable";
+import CreateHmo from "./CreateHmo";
 
 function Settings() {
   const [isLoading, setIsLoading] = useState(false);
@@ -158,6 +159,22 @@ function Settings() {
                 />
               </div>
             </div>
+          </div>
+        );
+
+      case "hmoSettings":
+        return (
+          <div className=" gap-16 w-100 border m-t-20">
+            <h3>HMO Settings</h3>
+           <CreateHmo/>
+          </div>
+        );
+
+      case "hmoPriceSettings":
+        return (
+          <div className=" gap-16 w-100 border m-t-20">
+            <h3>HMO Price Settings</h3>
+            <p>Manage HMO pricing and price mappings here.</p>
           </div>
         );
 
@@ -385,7 +402,24 @@ function Settings() {
         >
           Services Settings
         </div>
-       
+
+        <div
+          className={`tab-item ${
+            selectedTab === "hmoSettings" ? "active" : ""
+          }`}
+          onClick={() => setSelectedTab("hmoSettings")}
+        >
+          HMO Settings
+        </div>
+
+        <div
+          className={`tab-item ${
+            selectedTab === "hmoPriceSettings" ? "active" : ""
+          }`}
+          onClick={() => setSelectedTab("hmoPriceSettings")}
+        >
+          HMO Price Settings
+        </div>
       </div>
 
       {renderTabContent()}

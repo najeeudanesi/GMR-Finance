@@ -52,7 +52,6 @@ const AddInventory = () => {
     setFormData({ ...formData, [name]: value });
   };
 
-
   const handleFileChange = (e) => {
     const { name, files } = e.target;
     if (files.length > 0) {
@@ -87,8 +86,11 @@ const AddInventory = () => {
         productBarcode: formData.productBarcode,
       };
 
-      await post("/pharmacyinventory/inventory", requestBody);
+      const response = await post("/pharmacyinventory/inventory", requestBody);
+
+      console.log(response);
       toast.success("Inventory added successfully");
+      return;
       window.location.reload();
     } catch (error) {
       console.error("Error adding inventory:", error);
@@ -101,7 +103,6 @@ const AddInventory = () => {
     const [year, month, day] = date.split("-");
     return `${day}-${month}-${year}`;
   };
-
 
   return (
     <div className="w-100">
@@ -126,35 +127,115 @@ const AddInventory = () => {
               ))}
             </select>
           </div>
-          
-          <InputField label="Product Name" name="productName" type="text" onChange={handleChange} />
-          <InputField label="Quantity" name="quantity" type="text" onChange={handleChange} />
-          <div className="flex justify-between space-x-2">
-            <InputField label="Inventory Number" name="inventoryNumber" type="text" onChange={handleChange} />
-            <InputField label="Manufacturer" name="manufacturer" type="text" onChange={handleChange} />
-          </div>
-          <div className="flex justify-between space-x-2">
 
-            <DateInput label="Best Before" name="bestBefore" type="date" onChange={handleChange} value={formData.bestBefore} />
-            <DateInput label="Date Supplied" name="dateSupplied" type="date" onChange={handleChange} value={formData.dateSupplied} />
-          </div>
-          <InputField label="Mfg Batch Number" name="mfgBatchNumber" type="text" onChange={handleChange} />
+          <InputField
+            label="Product Name"
+            name="productName"
+            type="text"
+            onChange={handleChange}
+          />
+          <InputField
+            label="Quantity"
+            name="quantity"
+            type="text"
+            onChange={handleChange}
+          />
           <div className="flex justify-between space-x-2">
-            <InputField label="Cost Price" name="costPrice" type="text" onChange={handleChange} />
-            <InputField label="Selling Price" name="sellingPrice" type="text" onChange={handleChange} />
+            <InputField
+              label="Inventory Number"
+              name="inventoryNumber"
+              type="text"
+              onChange={handleChange}
+            />
+            <InputField
+              label="Manufacturer"
+              name="manufacturer"
+              type="text"
+              onChange={handleChange}
+            />
           </div>
           <div className="flex justify-between space-x-2">
-            <InputField label="Dosage" name="dosage" type="text" onChange={handleChange} />
-            <InputField label="Threshold Limit" name="thresholdLimit" type="text" onChange={handleChange} />
+            <DateInput
+              label="Best Before"
+              name="bestBefore"
+              type="date"
+              onChange={handleChange}
+              value={formData.bestBefore}
+            />
+            <DateInput
+              label="Date Supplied"
+              name="dateSupplied"
+              type="date"
+              onChange={handleChange}
+              value={formData.dateSupplied}
+            />
+          </div>
+          <InputField
+            label="Mfg Batch Number"
+            name="mfgBatchNumber"
+            type="text"
+            onChange={handleChange}
+          />
+          <div className="flex justify-between space-x-2">
+            <InputField
+              label="Cost Price"
+              name="costPrice"
+              type="text"
+              onChange={handleChange}
+            />
+            <InputField
+              label="Selling Price"
+              name="sellingPrice"
+              type="text"
+              onChange={handleChange}
+            />
           </div>
           <div className="flex justify-between space-x-2">
-            <InputField label="Supplier" name="supplier" type="text" onChange={handleChange} />
-            <InputField label="Ingredient" name="ingredient" type="text" onChange={handleChange} />
+            <InputField
+              label="Dosage"
+              name="dosage"
+              type="text"
+              onChange={handleChange}
+            />
+            <InputField
+              label="Threshold Limit"
+              name="thresholdLimit"
+              type="text"
+              onChange={handleChange}
+            />
           </div>
-          <TextField label="Cautions" name="cautions" type="textarea" onChange={handleChange} />
-          <TextField label="How to Use It" name="howToUseIt" type="textarea" onChange={handleChange} />
-          <TextField label="Product Description Overview" name="description" type="textarea" onChange={handleChange} />
-
+          <div className="flex justify-between space-x-2">
+            <InputField
+              label="Supplier"
+              name="supplier"
+              type="text"
+              onChange={handleChange}
+            />
+            <InputField
+              label="Ingredient"
+              name="ingredient"
+              type="text"
+              onChange={handleChange}
+            />
+          </div>
+          <TextField
+            label="Cautions"
+            name="cautions"
+            type="textarea"
+            onChange={handleChange}
+          />
+          <TextField
+            label="How to Use It"
+            name="howToUseIt"
+            type="textarea"
+            onChange={handleChange}
+          />
+          <TextField
+            label="Product Description Overview"
+            name="description"
+            type="textarea"
+            onChange={handleChange}
+          />
         </div>
 
         <div className="flex justify-between flex-col m-5">

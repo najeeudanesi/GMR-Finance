@@ -21,18 +21,17 @@ function AddCost({ closeModal, fetchData, modalData, currentPage }) {
   const [OtherServicecategories, setOtherServicecategories] = useState([]);
 
   function generateRandomNumber(min, max) {
-  // Ensure min and max are integers
-  min = Math.ceil(min);
-  max = Math.floor(max);
+    // Ensure min and max are integers
+    min = Math.ceil(min);
+    max = Math.floor(max);
 
- 
-  return Math.floor(Math.random() * (max - min + 1)) + min;
-}
+    return Math.floor(Math.random() * (max - min + 1)) + min;
+  }
 
-// Function specifically for your requested range (1 to 1,000,000)
-function generateRandomNumberBetween1AndMillion() {
-  return generateRandomNumber(1, 1000000);
-}
+  // Function specifically for your requested range (1 to 1,000,000)
+  function generateRandomNumberBetween1AndMillion() {
+    return generateRandomNumber(1, 1000000);
+  }
 
   useEffect(() => {
     fetchTreatmentCategory();
@@ -105,11 +104,14 @@ function generateRandomNumberBetween1AndMillion() {
     try {
       if (modalData) {
         // Update existing cost
-        await put(`/costsetup/${modalData.id}`, {...payload, itemId: modalData.itemId});
+        await put(`/costsetup/${modalData.id}`, {
+          ...payload,
+          itemId: parseInt(serviceId),
+        });
         toast.success("Cost updated successfully");
       } else {
         // Add new cost
-        await post("/costsetup", {...payload, itemId: generateRandomNumberBetween1AndMillion()});
+        await post("/costsetup", { ...payload, itemId: parseInt(serviceId) });
         toast.success("Cost added successfully");
       }
 

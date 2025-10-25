@@ -7,6 +7,7 @@ import { formatDate } from "../../../utility/general";
 import { format } from "date-fns";
 import SelectField from "../../UI/SelectField";
 import SelectField2 from "../../UI/SelectField copy";
+import toast from "react-hot-toast";
 const AddNewInventory = () => {
   const [selectedCategoryId, setSelectedCategoryId] = useState(1);
   const [categories, setcategories] = useState([]);
@@ -49,69 +50,66 @@ const AddNewInventory = () => {
   }, []);
 
   const dosageForms = [
-    { id: 'milligrams', label: 'Milligrams' },
-    { id: 'grams', label: 'Grams' },
-    { id: 'micrograms', label: 'Micrograms' },
-    { id: 'milliliters', label: 'Milliliters' },
-    { id: 'liters', label: 'Liters' },
-    { id: 'units', label: 'Units' },
-    { id: 'puffs', label: 'Puffs' },
-    { id: 'sprays', label: 'Sprays' },
-    { id: 'drops', label: 'Drops' },
-    { id: 'patch', label: 'Patch' },
-    { id: 'bottle', label: 'Bottle' },
-    { id: 'system', label: 'Transdermal System' },
-    { id: 'tablet', label: 'Tablet' },
-    { id: 'capsule', label: 'Capsule' },
-    { id: 'suppository', label: 'Suppository' },
-    { id: 'scoop', label: 'Scoop' },
-    { id: 'sachet', label: 'Sachet' },
-    { id: 'ampoule', label: 'Ampoule' },
-    { id: 'vial', label: 'Vial' },
-    { id: 'pen', label: 'Injection Pen' },
-    { id: 'enema', label: 'Enema' },
-    { id: 'ounces', label: 'Ounces' },
-    { id: 'teaspoon', label: 'Teaspoon' },
-    { id: 'tablespoon', label: 'Tablespoon' },
-    { id: 'milliequivalents', label: 'Milliequivalents' },
-    { id: 'internationalUnits', label: 'International Units' }
+    { id: "milligrams", label: "Milligrams" },
+    { id: "grams", label: "Grams" },
+    { id: "micrograms", label: "Micrograms" },
+    { id: "milliliters", label: "Milliliters" },
+    { id: "liters", label: "Liters" },
+    { id: "units", label: "Units" },
+    { id: "puffs", label: "Puffs" },
+    { id: "sprays", label: "Sprays" },
+    { id: "drops", label: "Drops" },
+    { id: "patch", label: "Patch" },
+    { id: "bottle", label: "Bottle" },
+    { id: "system", label: "Transdermal System" },
+    { id: "tablet", label: "Tablet" },
+    { id: "capsule", label: "Capsule" },
+    { id: "suppository", label: "Suppository" },
+    { id: "scoop", label: "Scoop" },
+    { id: "sachet", label: "Sachet" },
+    { id: "ampoule", label: "Ampoule" },
+    { id: "vial", label: "Vial" },
+    { id: "pen", label: "Injection Pen" },
+    { id: "enema", label: "Enema" },
+    { id: "ounces", label: "Ounces" },
+    { id: "teaspoon", label: "Teaspoon" },
+    { id: "tablespoon", label: "Tablespoon" },
+    { id: "milliequivalents", label: "Milliequivalents" },
+    { id: "internationalUnits", label: "International Units" },
   ];
-  
-  
-  const drugTypes = [
-    { id: 'Tablets', label: 'Tablets' },
-    { id: 'Capsules', label: 'Capsules' },
-    { id: 'Ampules', label: 'Ampules' },
-    { id: 'Vials', label: 'Vials' },
-    { id: 'Syringes', label: 'Syringes' },
-    { id: 'Suppositories', label: 'Suppositories' },
-    { id: 'Ointments', label: 'Ointments' },
-    { id: 'Creams', label: 'Creams' },
-    { id: 'Inhalers', label: 'Inhalers' },
-    { id: 'Patches (Transdermal)', label: 'Patches (Transdermal)' },
-    { id: 'Powders', label: 'Powders' },
-    { id: 'Drops (Ophthalmic/Otic)', label: 'Drops (Ophthalmic/Otic)' },
-    { id: 'Solutions', label: 'Solutions' },
-    { id: 'Suspensions', label: 'Suspensions' },
-    { id: 'Lozenges', label: 'Lozenges' },
-    { id: 'Liquids (Oral)', label: 'Liquids (Oral)' },
-    { id: 'Emulsions', label: 'Emulsions' },
-    { id: 'Gels', label: 'Gels' },
-    { id: 'Sprays', label: 'Sprays' },
-    { id: 'Pens (Injectables)', label: 'Pens (Injectables)' },
-    { id: 'Sachets', label: 'Sachets' },
-    { id: 'Nebules (for Nebulizers)', label: 'Nebules (for Nebulizers)' },
-    { id: 'Buccal Films', label: 'Buccal Films' },
-    { id: 'Transdermal Systems', label: 'Transdermal Systems' },
-    { id: 'Granules', label: 'Granules' },
-    { id: 'Implants', label: 'Implants' },
-    { id: 'Mouthwash/Rinse', label: 'Mouthwash/Rinse' },
-    { id: 'Foam', label: 'Foam' },
-    { id: 'Enemas', label: 'Enemas' },
-    { id: 'Nasal Spray', label: 'Nasal Spray' }
-  ];
-  
 
+  const drugTypes = [
+    { id: "Tablets", label: "Tablets" },
+    { id: "Capsules", label: "Capsules" },
+    { id: "Ampules", label: "Ampules" },
+    { id: "Vials", label: "Vials" },
+    { id: "Syringes", label: "Syringes" },
+    { id: "Suppositories", label: "Suppositories" },
+    { id: "Ointments", label: "Ointments" },
+    { id: "Creams", label: "Creams" },
+    { id: "Inhalers", label: "Inhalers" },
+    { id: "Patches (Transdermal)", label: "Patches (Transdermal)" },
+    { id: "Powders", label: "Powders" },
+    { id: "Drops (Ophthalmic/Otic)", label: "Drops (Ophthalmic/Otic)" },
+    { id: "Solutions", label: "Solutions" },
+    { id: "Suspensions", label: "Suspensions" },
+    { id: "Lozenges", label: "Lozenges" },
+    { id: "Liquids (Oral)", label: "Liquids (Oral)" },
+    { id: "Emulsions", label: "Emulsions" },
+    { id: "Gels", label: "Gels" },
+    { id: "Sprays", label: "Sprays" },
+    { id: "Pens (Injectables)", label: "Pens (Injectables)" },
+    { id: "Sachets", label: "Sachets" },
+    { id: "Nebules (for Nebulizers)", label: "Nebules (for Nebulizers)" },
+    { id: "Buccal Films", label: "Buccal Films" },
+    { id: "Transdermal Systems", label: "Transdermal Systems" },
+    { id: "Granules", label: "Granules" },
+    { id: "Implants", label: "Implants" },
+    { id: "Mouthwash/Rinse", label: "Mouthwash/Rinse" },
+    { id: "Foam", label: "Foam" },
+    { id: "Enemas", label: "Enemas" },
+    { id: "Nasal Spray", label: "Nasal Spray" },
+  ];
 
   const handleChange = (event) => {
     console.log(event.target.name);
@@ -123,8 +121,8 @@ const AddNewInventory = () => {
         type === "number"
           ? +value
           : type === "date"
-            ? format(new Date(value), "dd-MM-yyyy")
-            : value,
+          ? format(new Date(value), "dd-MM-yyyy")
+          : value,
     }));
   };
 
@@ -145,7 +143,16 @@ const AddNewInventory = () => {
 
       console.log(requestBody);
 
-      await post(`/pharmacyinventory/inventory`, requestBody);
+      const response = await post(`/pharmacyinventory/inventory`, requestBody);
+      console.log(response);
+      if (response) {
+        toast.success('"Inventory added successfully"');
+        // window.location.reload();
+      }
+
+      // alert();
+
+      // return
 
       // Reset formData to its initial state
       setFormData({
@@ -174,7 +181,7 @@ const AddNewInventory = () => {
         productBarcode: "",
       });
 
-      alert("Inventory updated successfully");
+      // alert("Inventory updated successfully");
     } catch (error) {
       console.error("Error updating inventory:", error);
       alert("Failed to update inventory");
@@ -210,14 +217,14 @@ const AddNewInventory = () => {
           />
           <InputField
             onChange={handleChange}
-            label="Brand Name"
+            label="Generic Name"
             value={formData.productName}
             name="productName"
             type="text"
           />
           <InputField
             onChange={handleChange}
-            label="Generic Name"
+            label="Brand Name"
             value={formData.productGenericName}
             name="productGenericName"
             type="text"
@@ -291,10 +298,8 @@ const AddNewInventory = () => {
               value={formData.ingredient}
               type="text"
             />
-
           </div>
           <div className="flex justify-between space-x-2">
-
             <InputField
               onChange={handleChange}
               label="Dosage"

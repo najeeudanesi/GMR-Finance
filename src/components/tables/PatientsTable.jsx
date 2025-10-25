@@ -1,6 +1,7 @@
 import React from "react";
 import { useNavigate } from "react-router-dom";
 import { formatDate } from "../../utility/general";
+import moment from "moment";
 
 function PatientsTable({ data }) {
 
@@ -12,7 +13,8 @@ function PatientsTable({ data }) {
         <table className="bordered-table">
           <thead className="border-top-none ">
             <tr className="border-top-none ">
-              {/* <th>Patient ID</th> */}
+              <th>Date</th>
+              <th>Time</th>
               <th>First Name</th>
               <th>Last Name</th>
 
@@ -28,7 +30,8 @@ function PatientsTable({ data }) {
 
               return (
                 <tr key={index} className="pointer" onClick={() => navigate(`/finance/patients-payment/${row.paymentDetails[0].patient.id}`)}>
-                  {/* <td>{row.id}</td> */}
+                  <td>{moment(row.dateUpdated).format("YYYY-MM-DD")}</td>
+                  <td>{moment(row.dateUpdated).format("HH:mm")}</td>
                   <td>{row?.firstName}</td>
                   <td>{row?.lastname}</td>
 

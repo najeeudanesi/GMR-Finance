@@ -10,6 +10,7 @@ import Pagination from "../UI/Pagination 2";
 
 function PatientsPayments() {
   const [costData, setCostData] = useState([]);
+  const [sortData, setSortData] = useState([]);
   const [loading, setLoading] = useState(false);
   const [currentPage, setCurrentPage] = useState(1);
   const [pageSize, setPageSize] = useState(20);
@@ -43,25 +44,38 @@ function PatientsPayments() {
     return pages;
   };
 
-
-
   const fetchData = useCallback(
     async (page, filter, query) => {
       setLoading(true);
       try {
         let data;
-        if (filter && query) {
-          data = await get(
-            `/patientpayment/filter-list/${filter}/${query}/${page}/${pageSize}`
+        // if (filter && query) {
+        if (query) {
+          console.log(query);
+          //  data = await get(
+          //   `/patientpayment/list/${page}/${pageSize}/patient-payment-list-v2`
+          // );
+          // data = await get(
+          //   `/patientpayment/filter-list/${filter}/${query}/${page}/${pageSize}`
+          // );
+          setCostData(
+            sortData.filter(
+              (item) =>
+                item?.firstName?.toLowerCase()?.includes(query.toLowerCase()) ||
+                item?.lastname?.toLowerCase().includes(query.toLowerCase())
+              // ||
+              // item.patientId.toString().includes(query)
+            )
           );
         } else {
           data = await get(
-            `/patientpayment/list/${page}/${pageSize}/patient-payment-list-v2`
+            `/patientpayment/list/${page}/${500}/patient-payment-list-v2`
           );
+          console.log(data?.resultList);
+          setCostData(data?.resultList || []);
+          setSortData(data?.resultList || []);
+          setTotalPages(data?.paginationMetadata?.totalPages || 1);
         }
-        console.log(data.resultList)
-        setCostData(data.resultList || []);
-        setTotalPages(data?.paginationMetadata?.totalPages || 1);
       } catch (error) {
         setCostData([]);
         console.error("Error fetching data:", error);
@@ -94,7 +108,6 @@ function PatientsPayments() {
 
   return (
     <div className="w-100 m-t-80 p-20">
-
       <div className="items-center">
         <div className="flex flex-v-center w-100 space-between">
           <h3 className="font-semibold">Patients Management</h3>
@@ -119,26 +132,30 @@ function PatientsPayments() {
               <img
                 src={downloadImg}
                 alt={downloadImg}
-                
                 className="w-full h-full object-cover rounded-full"
               />
             </div>
           </div>
         </div>
-        {loading ? <div className="m-t-20">Loading...</div> : (<> <div className="">
-          <PatientsTable data={costData} />
-        </div>
-          <div className="m-t-20 flex flex-h-end">
-            <Pagination
-              currentPage={currentPage}
-              totalPages={totalPages}
-              handlePageChange={handlePageChange}
-              generatePageNumbers={generatePageNumbers}
-            />
-          </div></>)}
-
+        {loading ? (
+          <div className="m-t-20">Loading...</div>
+        ) : (
+          <>
+            {" "}
+            <div className="">
+              <PatientsTable data={costData} />
+            </div>
+            <div className="m-t-20 flex flex-h-end">
+              <Pagination
+                currentPage={currentPage}
+                totalPages={totalPages}
+                handlePageChange={handlePageChange}
+                generatePageNumbers={generatePageNumbers}
+              />
+            </div>
+          </>
+        )}
       </div>
-
     </div>
   );
 }

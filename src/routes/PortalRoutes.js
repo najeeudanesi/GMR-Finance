@@ -14,12 +14,14 @@ import InsuranceDetails from '../components/pages/insurance-hmo/InsuranceDetails
 import AuthRoute from './AuthRoute';
 import Settings from '../components/pages/insurance-hmo/Settings';
 import Patients from '../components/pages/Patients';
+import PaymentRecords from '../components/pages/PaymentRecords';
 
 export default () => (
     <Routes>
         <Route path="/dashboard" element={<AuthRoute><Dashboard /></AuthRoute>} />
         <Route path="/patients-payment" element={<AuthRoute><PatientsPayments /></AuthRoute>} />
         <Route path="/patients-invoices" element={<AuthRoute><PatientsPaymentsByAppointment /></AuthRoute>} />
+        <Route path="/payment-records" element={<AuthRoute><PaymentRecords/></AuthRoute>} />
         <Route path="/wallet" element={<AuthRoute><Patients /></AuthRoute>} />
         <Route path="/cost-setup" element={<AuthRoute><CostSetUp /></AuthRoute>} />
         <Route path="/insurance" element={<AuthRoute><Insurance /></AuthRoute>} />

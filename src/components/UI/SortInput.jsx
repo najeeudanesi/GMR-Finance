@@ -1,4 +1,4 @@
-import React from 'react';
+import React from "react";
 import { BsChevronDown } from "react-icons/bs";
 
 const SortInput = ({ value, onChange, options, placeholder }) => (
@@ -6,13 +6,13 @@ const SortInput = ({ value, onChange, options, placeholder }) => (
     <select
       value={value}
       onChange={onChange}
-      className='w-full bg-transparent appearance-none border-none outline-none'
-      style={{ WebkitAppearance: 'none', MozAppearance: 'none' }}
+      className="w-full bg-transparent appearance-none border-none outline-none"
+      style={{ WebkitAppearance: "none", MozAppearance: "none" }}
     >
-      <option value="">{placeholder || 'Select filter'}</option>
-      {options.map((option) => (
-        <option key={option.value} value={option.value}>
-          {option.label}
+      <option value="">{placeholder || "Select filter"}</option>
+      {(Array.isArray(options) ? options : []).map((option) => (
+        <option key={option?.value} value={option?.value}>
+          {option?.label}
         </option>
       ))}
     </select>

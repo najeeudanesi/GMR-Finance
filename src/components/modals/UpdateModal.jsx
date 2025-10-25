@@ -12,6 +12,7 @@ function UpdateModal({
   onClose,
   patientId,
   topData,
+  depositBalance,
   patientPaymentId,
   amountOwed,
   setpaid,
@@ -36,9 +37,10 @@ function UpdateModal({
   const [loading, setLoading] = useState(false);
   const navigate = useNavigate();
 
-  console.log(topData);
+  console.log(depositBalance, "depositBalance");
 
   useEffect(() => {
+    // console.log(depositBalance)
     if (paymentBreakdownData) {
       setFormData({
         patientId: parseInt(paymentBreakdownData?.patientId, 10),
@@ -49,12 +51,12 @@ function UpdateModal({
         comment: "",
       });
     }
-  }, [paymentBreakdownData, ]);
+  }, [paymentBreakdownData, depositBalance]);
 
   useEffect(() => {
     setFormData((prevData) => ({
       ...prevData,
-      availableBalance: (topData?.patientTotalBalance) - (prevData.amountPaid || 0),
+      availableBalance: (paymentBreakdownData?.patientBalance) - (prevData.amountPaid || 0),
       amountOwed:
         formData?.amountPayableBy === "Patient"
           ? paymentBreakdownData?.patientBalance
@@ -131,6 +133,10 @@ function UpdateModal({
         },
       ],
     };
+
+    console.log(data, "data");
+
+    // return;
 
     try {
       const response = await put(
@@ -237,11 +243,11 @@ function UpdateModal({
                 />
                  <InputField
                   label="Discounted Amount"
-                  name="amountOwed"
-                  value={topData.discountedAmount||0}
+                  name="discountedAmount"
+                  value={paymentBreakdownData.discountedAmount||0}
                   onChange={handleChange}
                   type="number"
-                  disabled
+                  // disabled
                 />
                 <InputField
                   label="Amount Paid"
@@ -255,7 +261,7 @@ function UpdateModal({
                 <InputField
                   label="Available Balance"
                   name="availableBalance"
-                  value={formData.availableBalance}
+                  value={formData.availableBalance }
                   onChange={handleChange}
                   type="number"
                   required
@@ -274,13 +280,19 @@ function UpdateModal({
               (formData.amountPayableBy == "wallet" && (
                 <div className="flex">
                   <div className="w-100 m-t-10 ">
-                    <div
-                      className="btn w-10"
-                      onClick={() =>
-                        setFormData({ ...formData, amountPayableBy: "Patient" })
-                      }
-                    >
-                      Back
+                    <div className="flex w-100 space-between">
+                      <div
+                        className="btn w-10"
+                        onClick={() =>
+                          setFormData({ ...formData, amountPayableBy: "Patient" })
+                        }
+                      >
+                        Back
+                      </div>
+                      {/* <div  style={{justifyContent: "space-between"}} className="m-l-20">
+                        Available Wallet Balance: NGN{" "}
+                          {depositBalance|| 0}
+                      </div> */}
                     </div>
                     <TagInputs
                       label="Select Bill"

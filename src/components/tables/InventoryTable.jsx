@@ -7,8 +7,6 @@ import delet from "../../assets/svg/delete.svg";
 import toast from "react-hot-toast";
 import ConfirmationModal from "../modals/ConfirmationModal";
 
-
-
 function InventoryTable() {
   const [inventoryData, setInventoryData] = useState([]);
   const [filteredData, setFilteredData] = useState([]);
@@ -19,13 +17,29 @@ function InventoryTable() {
   const [searchText, setSearchText] = useState("");
   const [editModalOpen, setEditModalOpen] = useState(false);
   const [selectedData, setSelectedData] = useState(null);
-  const [itemToDelete, setItemToDelete] = useState(0)
-  const [isModalOpen, setIsModalOpen] = useState(false)
+  const [itemToDelete, setItemToDelete] = useState(0);
+  const [isModalOpen, setIsModalOpen] = useState(false);
 
   const fetchInventoryData = async (page, size) => {
     setLoading(true);
     try {
       const data = await get(`/pharmacyinventory/list/${page}/${size}`);
+      setInventoryData(data.resultList);
+      setFilteredData(data.resultList); // Set filtered data initially
+      setTotalPages(data?.paginationMetadata?.totalPages);
+    } catch (e) {
+      console.log("Error fetching inventory data:", e);
+    }
+    setLoading(false);
+  };
+  // https://edogoverp.com/healthfinanceapi/api/pharmacyinventory/history/filter-list/ty/67/1/10
+
+  const searchInventoryData = async (text, page, size) => {
+    setLoading(true);
+    try {
+      const data = await get(
+        `/pharmacyinventory/filter-list/${"name"}/${text}/${page}/${size}`
+      );
       setInventoryData(data.resultList);
       setFilteredData(data.resultList); // Set filtered data initially
       setTotalPages(data?.paginationMetadata?.totalPages);
@@ -60,30 +74,29 @@ function InventoryTable() {
   const handleSearchChange = (event) => {
     const value = event.target.value;
     setSearchText(value);
-
+    value ? searchInventoryData(value, 1, 10) : fetchInventoryData(1, 10);
     // Filter inventory data based on the search text
-    const filtered = inventoryData.filter((item) =>
-      item.productName.toLowerCase().includes(value.toLowerCase()) ||
-      item.manufacturer.toLowerCase().includes(value.toLowerCase()) ||
-      item.supplier.toLowerCase().includes(value.toLowerCase()) ||
-      item.inventoryNumber.toLowerCase().includes(value.toLowerCase())
-    );
+    // const filtered = inventoryData.filter((item) =>
+    //   item.productName.toLowerCase().includes(value.toLowerCase()) ||
+    //   item.manufacturer.toLowerCase().includes(value.toLowerCase()) ||
+    //   item.supplier.toLowerCase().includes(value.toLowerCase()) ||
+    //   item.inventoryNumber.toLowerCase().includes(value.toLowerCase())
+    // );
 
-    setFilteredData(filtered);
+    // setFilteredData(filtered);
     setCurrentPage(1); // Reset to first page on search
   };
 
   const stageData = (data) => {
     setSelectedData(data);
     setEditModalOpen(true);
-  }
+  };
 
   // Paginate the filtered data
   const paginatedData = filteredData.slice(
     (currentPage - 1) * pageSize,
     currentPage * pageSize
   );
-
 
   const handleDeleteClick = (itemId) => {
     setItemToDelete(itemId);
@@ -136,16 +149,24 @@ function InventoryTable() {
                   <td>{row.inventoryNumber}</td>
                   <td>{row.bestBefore}</td>
                   <td>{row.actionTaken}</td>
-                  <td className="w-7"> <div className="underline flex gap2">
-                    <img src={edit} alt="" onClick={() => stageData(row)} className="pointer" />
+                  <td className="w-7">
+                    {" "}
+                    <div className="underline flex gap2">
+                      <img
+                        src={edit}
+                        alt=""
+                        onClick={() => stageData(row)}
+                        className="pointer"
+                      />
 
-                    <img
-                      className="pointer"
-                      src={delet}
-                      alt="delete"
-                      onClick={() => handleDeleteClick(row?.id)}
-                    />
-                  </div></td>
+                      <img
+                        className="pointer"
+                        src={delet}
+                        alt="delete"
+                        onClick={() => handleDeleteClick(row?.id)}
+                      />
+                    </div>
+                  </td>
                 </tr>
               ))}
             </tbody>
@@ -174,7 +195,6 @@ function InventoryTable() {
         </div>
       </div>
 
-
       {isModalOpen && (
         <ConfirmationModal
           closeModal={() => setIsModalOpen(false)}
@@ -184,15 +204,13 @@ function InventoryTable() {
         />
       )}
 
-      {
-        editModalOpen && (
-          <EditInventoryItem
-            closeModal={() => setEditModalOpen(false)}
-            isOpen={editModalOpen}
-            data={selectedData}
-          />)
-      }
-
+      {editModalOpen && (
+        <EditInventoryItem
+          closeModal={() => setEditModalOpen(false)}
+          isOpen={editModalOpen}
+          data={selectedData}
+        />
+      )}
     </div>
   );
 }

@@ -12,12 +12,14 @@ import PaymentHistory from "../modals/PaymentHistory";
 function PatientOverview() {
   const [patient, setPatient] = useState(null);
   const [extraDetails, setExtraDetails] = useState(null);
+  const [depositDetails, setDepositDetails] = useState(null);
   const [searchText, setSearchText] = useState("");
   const [loading, setLoading] = useState(true);
   const [isUpdateModalOpen, setIsUpdateModalOpen] = useState(false);
   const [isPaymentHistoryOpen, setIsPaymentHistoryOpen] = useState(false);
-  const [isPaymentHistoryCollapsed, setIsPaymentHistoryCollapsed] = useState(true);
-  const [hmoClass, setHmoClass] = useState('');
+  const [isPaymentHistoryCollapsed, setIsPaymentHistoryCollapsed] =
+    useState(true);
+  const [hmoClass, setHmoClass] = useState("");
   const [updateFormData, setUpdateFormData] = useState({
     amountPayableBy: "",
     amountOwned: "",
@@ -34,11 +36,12 @@ function PatientOverview() {
 
   const getPatientDetails = async () => {
     try {
-      const data = await get(`/patientpayment/${patientId}`);
-      setPatient(data);
-      setHmoClass(data?.paymentBreakdowns[0]?.hmoClass?.hmoClass);
+      const data = await get(`/patient/${patientId}`);
       console.log(data);
-      getPatientExtraDetails(data?.patient?.id)
+      setPatient(data);
+      // setHmoClass(data?.paymentBreakdowns[0]?.hmoClass?.hmoClass);
+      console.log(data);
+      // getPatientExtraDetails(patientId)
     } catch (e) {
       console.log(e);
       toast.error("Failed to fetch patient details");
@@ -49,17 +52,30 @@ function PatientOverview() {
     try {
       const data = await get(`/patient/${id}`);
       setExtraDetails(data);
-      console.log(data)
+      console.log(data);
     } catch (e) {
       console.log(e);
       toast.error("Failed to fetch extra patient details");
     }
   };
 
+  const getPatientDepositDetails = async (id) => {
+    try {
+      const data = await get(`/depositwallet/patientid/${id}`);
+      setDepositDetails(data?.data || null);
+    } catch (e) {
+      console.log(e);
+      toast.error("Failed to fetch deposit details");
+    }
+  };
+
   useEffect(() => {
     const fetchData = async () => {
       setLoading(true);
-      await Promise.all([getPatientDetails(), ]);
+      await Promise.all([
+        getPatientDetails(),
+        getPatientDepositDetails(patientId),
+      ]);
       setLoading(false);
     };
     fetchData();
@@ -96,6 +112,76 @@ function PatientOverview() {
     <div className="w-full">
       <div className="mt-10">
         <div className="w-full">
+          {/* Deposit Information Section */}
+          {/* {depositDetails && (
+            <div className="mb-8 p-4 border border-green-400 rounded bg-green-50">
+              <h3 className="font-bold text-lg mb-2 text-green-700">
+                Deposit Information
+              </h3>
+              <div className="flex flex-wrap gap-8 mb-2">
+                <div>
+                  <span className="font-semibold">Last Deposited Amount:</span>{" "}
+                  N{depositDetails.lastDepositedAmount?.toLocaleString() || 0}
+                </div>
+                <div>
+                  <span className="font-semibold">Available Balance:</span> N
+                  {depositDetails.availableBalance?.toLocaleString() || 0}
+                </div>
+                <div>
+                  <span className="font-semibold">Last Deposit Date:</span>{" "}
+                  {depositDetails.lastDepositDate
+                    ? new Date(depositDetails.lastDepositDate).toLocaleString()
+                    : "N/A"}
+                </div>
+              </div>
+              {depositDetails.depositWalletHistories?.length > 0 && (
+                <div className="overflow-x-auto">
+                  <table className="min-w-full border border-gray-300 mt-2">
+                    <thead className="bg-green-200">
+                      <tr>
+                        <th className="px-2 py-1 border">Transaction #</th>
+                        <th className="px-2 py-1 border">Amount</th>
+                        <th className="px-2 py-1 border">Balance</th>
+                        <th className="px-2 py-1 border">Purpose</th>
+                        <th className="px-2 py-1 border">By</th>
+                        <th className="px-2 py-1 border">Date</th>
+                      </tr>
+                    </thead>
+                    <tbody>
+                      {depositDetails.depositWalletHistories.map((hist) => (
+                        <tr
+                          key={hist.id}
+                          className="bg-white hover:bg-green-50"
+                        >
+                          <td className="px-2 py-1 border">
+                            {hist.transactionNumber}
+                          </td>
+                          <td className="px-2 py-1 border">
+                            N{hist.amountTransacted?.toLocaleString() || 0}
+                          </td>
+                          <td className="px-2 py-1 border">
+                            N{hist.currentBalance?.toLocaleString() || 0}
+                          </td>
+                          <td className="px-2 py-1 border">
+                            {hist.transactionPurpose}
+                          </td>
+                          <td className="px-2 py-1 border">
+                            {hist.transactionCreatedBy?.firstName}{" "}
+                            {hist.transactionCreatedBy?.lastName}
+                          </td>
+                          <td className="px-2 py-1 border">
+                            {hist.transactionDate
+                              ? new Date(hist.transactionDate).toLocaleString()
+                              : "N/A"}
+                          </td>
+                        </tr>
+                      ))}
+                    </tbody>
+                  </table>
+                </div>
+              )}
+            </div>
+          )} */}
           <div className="m-t-80 flex space-between w-full mt-5 underline-container flex items-center justify-between py-4">
             <h2 className="text-xl font-semibold">Patient Payments</h2>
             <div className="flex items-center space-x-4">
@@ -137,7 +223,7 @@ function PatientOverview() {
                       navigate(`/finance/patients-details/${patientId}`)
                     }
                   >
-                    {patient?.patient.firstName} {patient?.patient?.lastName}
+                    {patient?.firstName} {patient?.lastName}
                   </p>
                 </div>
                 <div className="flex items-center gap-4">
@@ -164,6 +250,11 @@ function PatientOverview() {
                 disabled={true}
                 value={extraDetails?.patientHmo?.validity || "n/a"}
               />
+              <InputField
+                label="Deposit Balance"
+                disabled={true}
+                value={depositDetails?.availableBalance?.toLocaleString() || 0}
+              />
             </div>
           </div>
           <div className="w-1/2 items-center flex">
@@ -185,13 +276,14 @@ function PatientOverview() {
           </div>
 
           <div className="mt-5">
-            <h3 className="font-semibold cursor-pointer save-drafts" onClick={togglePaymentHistory}>
+            <h3
+              className="font-semibold cursor-pointer save-drafts"
+              onClick={togglePaymentHistory}
+            >
               {isPaymentHistoryCollapsed ? "Show" : "Hide"} Payment History
             </h3>
             {!isPaymentHistoryCollapsed && (
-              <PaymentHistory
-                patientId={patient?.patient?.id}
-              />
+              <PaymentHistory patientId={patient?.patient?.id} />
             )}
           </div>
 
@@ -201,6 +293,7 @@ function PatientOverview() {
             amountOwed={patient?.patientBalance}
             patientId={patient?.patient?.id}
             patientPaymentId={patient?.id}
+            depositBalance={3}
           />
         </div>
       </div>
