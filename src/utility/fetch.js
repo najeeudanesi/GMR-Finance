@@ -61,20 +61,31 @@ async function fetchBackend(endpoint, method, auth, body, params) {
 
     return response.json();
   } catch (error) {
-    // Show specific validation error if present
+    // Show specific validation error if present (but not for GET requests)
     if (
       error.serverErrorData &&
       error.serverErrorData.errorData &&
       Array.isArray(error.serverErrorData.errorData) &&
       error.serverErrorData.errorData.length > 0
     ) {
-      toast.error(error.serverErrorData.errorData[0]);
-      console.error("API Validation Error:", error.serverErrorData.errorData[0]);
+      if (method !== "GET") {
+        toast.error(error.serverErrorData.errorData[0]);
+      }
+      console.error(
+        "API Validation Error:",
+        error.serverErrorData.errorData[0]
+      );
     } else if (error.serverErrorData && error.serverErrorData.message) {
-      toast.error(error.serverErrorData.message);
+      if (method !== "GET") {
+        toast.error(error.serverErrorData.message);
+      }
       console.error("General Server Message:", error.serverErrorData.message);
     } else if (error.response) {
-      toast.error(`Server Error: ${error.response.status} ${error.response.statusText}`);
+      if (method !== "GET") {
+        toast.error(
+          `Server Error: ${error.response.status} ${error.response.statusText}`
+        );
+      }
       console.error(
         "Non-JSON error response from server:",
         error.response.status,
@@ -84,10 +95,14 @@ async function fetchBackend(endpoint, method, auth, body, params) {
       error instanceof TypeError &&
       error.message === "Failed to fetch"
     ) {
-      toast.error("Network error: Could not connect to the server.");
+      if (method !== "GET") {
+        toast.error("Network error: Could not connect to the server.");
+      }
       console.error("Network or CORS error: Unable to connect to backend.");
     } else {
-      toast.error("An unexpected error occurred. Please try again.");
+      if (method !== "GET") {
+        toast.error("An unexpected error occurred. Please try again.");
+      }
       console.error("An unexpected error occurred:", error.message);
     }
     // Optionally, rethrow or return a structured error object

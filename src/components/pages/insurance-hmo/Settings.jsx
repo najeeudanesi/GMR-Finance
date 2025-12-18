@@ -23,6 +23,9 @@ function Settings() {
   const [serviceObject, setserviceObject] = useState("");
   const [OtherServicecategories, setOtherServicecategories] = useState([]);
   const [selectedCategoryId, setSelectedCategoryId] = useState("");
+  const [unitCost, setUnitCost] = useState("");
+  const [isConsultation, setIsConsultation] = useState(false);
+  const [note, setNote] = useState("");
   const [categories, setcategories] = useState([]);
   const [selectedTab, setSelectedTab] = useState("create-hmo");
 
@@ -121,6 +124,41 @@ function Settings() {
                   type="text"
                 />
               </div>
+              <div className="m-t-20">
+                <InputField
+                  onChange={(e) => {
+                    setUnitCost(e.target.value);
+                  }}
+                  value={unitCost}
+                  label="Unit Cost"
+                  name="unitCost"
+                  type="number"
+                />
+              </div>
+
+              <div className="m-t-10">
+                <label
+                  className="label"
+                  style={{ display: "flex", alignItems: "center", gap: 8 }}
+                >
+                  <input
+                    type="checkbox"
+                    checked={isConsultation}
+                    onChange={(e) => setIsConsultation(e.target.checked)}
+                  />
+                  Is Consultation
+                </label>
+              </div>
+
+              <div className="m-t-20">
+                <InputField
+                  onChange={(e) => setNote(e.target.value)}
+                  value={note}
+                  label="Note"
+                  name="note"
+                  type="text"
+                />
+              </div>
               <button
                 className="btn w-40 m-t-5"
                 onClick={!categoryObject ? addService : editService}
@@ -135,6 +173,9 @@ function Settings() {
                     setsubCategoryName("");
                     setserviceObject(null);
                     setSelectedCategoryId("");
+                    setUnitCost("");
+                    setIsConsultation(false);
+                    setNote("");
                   }}
                 >
                   Clear Category
@@ -150,14 +191,14 @@ function Settings() {
                 data={categories}
                 isloading={isLoading}
               />
-              <div className="flex flex-h-end m-t-20">
+              {/* <div className="flex flex-h-end m-t-20">
                 <Pagination
                   currentPage={currentPage}
                   pageSize={pageSize}
                   totalPages={totalPages}
                   onPageChange={handlePageChange}
                 />
-              </div>
+              </div> */}
             </div>
           </div>
         );
@@ -166,7 +207,7 @@ function Settings() {
         return (
           <div className=" gap-16 w-100 border m-t-20">
             <h3>HMO Settings</h3>
-           <CreateHmo/>
+            <CreateHmo />
           </div>
         );
 
@@ -218,6 +259,8 @@ function Settings() {
                 setCategoryName={setCategoryName}
                 data={data}
                 isloading={isLoading}
+                currentPage={currentPage}
+                pageSize={pageSize}
               />
               <div className="flex flex-h-end m-t-20">
                 <Pagination
@@ -325,6 +368,9 @@ function Settings() {
     let payload = {
       itemName: subCategoryName,
       categoryId: +selectedCategoryId,
+      unitCost: Number(unitCost) || 0,
+      isConsultation: Boolean(isConsultation),
+      note: note || null,
     };
     console.log(payload);
 
@@ -332,7 +378,12 @@ function Settings() {
     try {
       const response = await post(`/categoryitem`, payload);
       fetchData(currentPage, pageSize);
-
+      // reset form fields after successful create
+      setsubCategoryName("");
+      setSelectedCategoryId("");
+      setUnitCost("");
+      setIsConsultation(false);
+      setNote("");
       console.log(response);
     } catch (e) {
       console.log(e);
@@ -340,21 +391,28 @@ function Settings() {
   };
 
   const editService = async () => {
-    console.log(categoryName);
+    console.log(subCategoryName);
     let payload = {
-      name: categoryName,
-      userId: +localStorage.getItem("userId"),
+      itemName: subCategoryName,
+      categoryId: +selectedCategoryId,
+      unitCost: Number(unitCost) || 0,
+      isConsultation: Boolean(isConsultation),
+      note: note || null,
     };
     console.log(payload);
 
-    return;
     try {
-      const response = await put(
-        `/categoryitem/${categoryObject?.id}`,
-        payload
-      );
-      //   const response = await put(`/category`);
-      fetchData(currentPage, pageSize);
+      const response = await put(`/categoryitem/${serviceObject?.id}`, payload);
+      // refresh list of services
+      fetchServices();
+
+      // reset form fields after update
+      setsubCategoryName("");
+      setSelectedCategoryId("");
+      setUnitCost("");
+      setIsConsultation(false);
+      setNote("");
+      setserviceObject(null);
 
       console.log(response);
     } catch (e) {
@@ -412,14 +470,14 @@ function Settings() {
           HMO Settings
         </div>
 
-        <div
+        {/* <div
           className={`tab-item ${
             selectedTab === "hmoPriceSettings" ? "active" : ""
           }`}
           onClick={() => setSelectedTab("hmoPriceSettings")}
         >
           HMO Price Settings
-        </div>
+        </div> */}
       </div>
 
       {renderTabContent()}

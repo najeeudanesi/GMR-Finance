@@ -3,8 +3,20 @@ import React, { useState } from "react";
 import { formatDate } from "../../utility/general";
 import { useNavigate } from "react-router-dom";
 import AddPackageModal from "../modals/AddPackageModal";
+import edit from "../../assets/svg/edit.svg";
+import deleteIcon from "../../assets/svg/delete.svg";
+import addIcon from "../../assets/svg/add.svg";
 
-function HmoTable({ data, isloading, patientId, onActionClick }) {
+function HmoTable({
+  data,
+  isloading,
+  patientId,
+  onActionClick,
+  currentPage = 1,
+  pageSize = 10,
+  onEdit,
+  onDelete,
+}) {
   const [showAddPackage, setShowAddPackage] = useState(false);
   const [activeRow, setActiveRow] = useState(null);
 
@@ -18,39 +30,111 @@ function HmoTable({ data, isloading, patientId, onActionClick }) {
               <table className="bordered-table-2">
                 <thead className="border-top-none">
                   <tr className="border-top-none">
+                    <th>S/N</th>
                     <th className="w-20">Date</th>
-                    <th>Vendor's Name</th>
+                    <th>HMO's Name</th>
                     <th>Packages</th>
                     <th>Contact Information</th>
                     <th>Phone Number</th>
-                    <th>Action</th>
+                    <th>Actions</th>
                   </tr>
                 </thead>
 
                 <tbody className="white-bg view-det-pane">
                   {data.map((row, index) => (
-                    <tr
-                      key={index}
-                      className="pointer"
-                      onClick={() => navigate(`/finance/insurance/${row?.id}`)}
-                    >
-                      <td>{formatDate(row?.createdOn) || ""}</td>
+                    <tr key={index} className="pointer">
+                      <td
+                        onClick={() =>
+                          navigate(`/finance/insurance/${row?.id}`)
+                        }
+                      >
+                        {(currentPage - 1) * pageSize + index + 1}
+                      </td>
+                      <td
+                        onClick={() =>
+                          navigate(`/finance/insurance/${row?.id}`)
+                        }
+                      >
+                        {formatDate(row?.createdOn) || ""}
+                      </td>
 
-                      <td>{row?.vendorName}</td>
-                      <td>{row?.packages?.map((pkg) => pkg.name).join(", ")}</td>
-                      <td>{row?.email}</td>
-                      <td>{row?.phoneNumber}</td>
+                      <td
+                        onClick={() =>
+                          navigate(`/finance/insurance/${row?.id}`)
+                        }
+                      >
+                        {row?.vendorName}
+                      </td>
+                      <td
+                        onClick={() =>
+                          navigate(`/finance/insurance/${row?.id}`)
+                        }
+                      >
+                        {row?.packages?.map((pkg) => pkg.name).join(", ")}
+                      </td>
+                      <td
+                        onClick={() =>
+                          navigate(`/finance/insurance/${row?.id}`)
+                        }
+                      >
+                        {row?.email}
+                      </td>
+                      <td
+                        onClick={() =>
+                          navigate(`/finance/insurance/${row?.id}`)
+                        }
+                      >
+                        {row?.phoneNumber}
+                      </td>
                       <td>
-                        <button
-                          className="btn"
-                          onClick={(e) => {
-                            e.stopPropagation();
-                            setActiveRow(row);
-                            setShowAddPackage(true);
-                          }}
-                        >
-                          Action
-                        </button>
+                        <div className="flex gap-5">
+                          <img
+                            src={addIcon}
+                            alt="Add Package"
+                            className="pointer"
+                            onClick={(e) => {
+                              e.stopPropagation();
+                              setActiveRow(row);
+                              setShowAddPackage(true);
+                            }}
+                            style={{ width: 20, height: 20, cursor: "pointer" }}
+                            title="Add Package"
+                          />
+                          {onEdit && (
+                            <img
+                              src={edit}
+                              alt="Edit"
+                              className="pointer"
+                              onClick={(e) => {
+                                e.stopPropagation();
+                                onEdit(row);
+                              }}
+                              style={{
+                                width: 20,
+                                height: 20,
+                                cursor: "pointer",
+                              }}
+                              title="Edit"
+                            />
+                          )}
+                          {onDelete && (
+                            <img
+                              src={deleteIcon}
+                              alt="Delete"
+                              className="pointer"
+                              onClick={(e) => {
+                                e.stopPropagation();
+                                onDelete(row.id);
+                              }}
+                              style={{
+                                width: 20,
+                                height: 20,
+                                cursor: "pointer",
+                              }}
+                              title="Delete"
+                            />
+                          )}
+                        </div>
                       </td>
                     </tr>
                   ))}

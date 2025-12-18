@@ -5,7 +5,7 @@ import { get } from "../../utility/fetch2";
 import { get as gets } from "../../utility/fetch";
 import "../../assets/css/table.css";
 import { RiCloseFill } from "react-icons/ri";
-import { usePDF } from 'react-to-pdf';
+import { usePDF } from "react-to-pdf";
 import { useEffect } from "react";
 import moment from "moment";
 
@@ -49,8 +49,6 @@ function PatientsInvoiceTable({ data }) {
     }
   };
 
-
-
   // useEffect(() => {
   //   fetchPaidUsers();
   // }, []);
@@ -64,13 +62,78 @@ function PatientsInvoiceTable({ data }) {
     fetchPatientsBreakdownByAppointmentId(row.id);
   };
 
+  // Search state
+  const [searchPhone, setSearchPhone] = useState("");
+  const [startDate, setStartDate] = useState("");
+  const [endDate, setEndDate] = useState("");
+
+  // Filtered data with date range
+  const filteredData = data?.filter((row) => {
+    const phoneMatch = searchPhone
+      ? (row?.phoneNumber || "")
+          .toLowerCase()
+          .includes(searchPhone.toLowerCase())
+      : true;
+    let dateMatch = true;
+    const rowDate = moment(row?.updatedAt).format("YYYY-MM-DD");
+    if (startDate && endDate) {
+      dateMatch = rowDate >= startDate && rowDate <= endDate;
+    } else if (startDate) {
+      dateMatch = rowDate >= startDate;
+    } else if (endDate) {
+      dateMatch = rowDate <= endDate;
+    }
+    return phoneMatch && dateMatch;
+  });
+
   return (
     <div className="w-100">
+      <div className="flex gap-10 m-b-20">
+        <input
+          type="text"
+          placeholder="Search by phone number"
+          value={searchPhone}
+          onChange={(e) => setSearchPhone(e.target.value)}
+          style={{ padding: "8px", border: "1px solid #ccc", borderRadius: 4 }}
+        />
+        <input
+          type="date"
+          value={startDate}
+          onChange={(e) => setStartDate(e.target.value)}
+          style={{ padding: "8px", border: "1px solid #ccc", borderRadius: 4 }}
+        />
+        <span style={{ alignSelf: "center" }}>to</span>
+        <input
+          type="date"
+          value={endDate}
+          onChange={(e) => setEndDate(e.target.value)}
+          style={{ padding: "8px", border: "1px solid #ccc", borderRadius: 4 }}
+        />
+        {(searchPhone || startDate || endDate) && (
+          <button
+            onClick={() => {
+              setSearchPhone("");
+              setStartDate("");
+              setEndDate("");
+            }}
+            style={{
+              padding: "8px 12px",
+              borderRadius: 4,
+              background: "#eee",
+              border: "none",
+              cursor: "pointer",
+            }}
+          >
+            Clear
+          </button>
+        )}
+      </div>
       <div className="w-100 none-flex-item m-t-40">
         {/* Patients Table */}
         <table className="bordered-table">
           <thead>
             <tr>
+              <th>S/N</th>
               <th>Date</th>
               <th>Time</th>
               <th>Patient ID</th>
@@ -80,22 +143,31 @@ function PatientsInvoiceTable({ data }) {
             </tr>
           </thead>
           <tbody className="white-bg view-det-pane">
-            {data?.map((row, index) => (
-              <tr
-                key={index}
-                className="pointer"
-                onClick={() =>
-                  fetchPatientsAppointmentData(row.id || row.patientId)
-                }
-              >
-                <td>{moment(row?.updatedAt).format("YYYY-MM-DD")}</td>
-                <td>{moment(row?.updatedAt).format("HH:mm")}</td>
-                <td>#{row?.id}</td>
-                <td>{row?.firstName}</td>
-                <td>{row?.lastName}</td>
-                <td>{row?.phoneNumber}</td>
+            {filteredData?.length > 0 ? (
+              filteredData.map((row, index) => (
+                <tr
+                  key={index}
+                  className="pointer"
+                  onClick={() =>
+                    fetchPatientsAppointmentData(row.id || row.patientId)
+                  }
+                >
+                  <td>{index + 1}</td>
+                  <td>{moment(row?.updatedAt).format("YYYY-MM-DD")}</td>
+                  <td>{moment(row?.updatedAt).format("HH:mm")}</td>
+                  <td>#{row?.id}</td>
+                  <td>{row?.firstName}</td>
+                  <td>{row?.lastName}</td>
+                  <td>{row?.phoneNumber}</td>
+                </tr>
+              ))
+            ) : (
+              <tr>
+                <td colSpan={7} style={{ textAlign: "center" }}>
+                  No records found.
+                </td>
               </tr>
-            ))}
+            )}
           </tbody>
         </table>
       </div>
@@ -119,7 +191,7 @@ function PatientsInvoiceTable({ data }) {
             >
               Show Appointments Table
             </button>
-            <button
+            {/* <button
               className={`btn ${
                 !showAppointmentsModal
                   ? "bg-green-500 text-white"
@@ -141,12 +213,13 @@ function PatientsInvoiceTable({ data }) {
               // disabled={!showAppointmentsModal}
             >
               Show Payment History Table
-            </button>
+            </button> */}
           </div>
           {showAppointmentsModal ? (
             <table className="bordered-table">
               <thead>
                 <tr>
+                  <th>S/N</th>
                   <th>Patient Name</th>
                   <th>Appointment ID</th>
                   <th>Appointment Date</th>
@@ -160,6 +233,7 @@ function PatientsInvoiceTable({ data }) {
                       className="pointer"
                       onClick={() => handleRowClick(index, row)}
                     >
+                      <td>{index + 1}</td>
                       <td>{row?.patientName}</td>
                       <td>A-{row?.id}</td>
                       <td>{row?.appointDate}</td>
@@ -172,7 +246,7 @@ function PatientsInvoiceTable({ data }) {
                           selectedRowIndex === index ? "active" : ""
                         }`}
                       >
-                        <td colSpan="4">
+                        <td colSpan="5">
                           <div
                             className={`invoice-container ${
                               selectedRowIndex === index ? "active" : ""
@@ -191,6 +265,7 @@ function PatientsInvoiceTable({ data }) {
             <table className="bordered-table">
               <thead>
                 <tr>
+                  <th>S/N</th>
                   <th>Payment ID</th>
                   <th>Diagnosis</th>
                   <th>Visit Started</th>
@@ -203,6 +278,7 @@ function PatientsInvoiceTable({ data }) {
                 {paymentHistoryModal.length > 0 ? (
                   paymentHistoryModal.map((row, idx) => (
                     <tr key={row.id || idx}>
+                      <td>{idx + 1}</td>
                       <td>{row.id}</td>
                       <td>{row.diagnosis}</td>
                       <td>{row.visitStartedOn}</td>
@@ -219,7 +295,7 @@ function PatientsInvoiceTable({ data }) {
                   ))
                 ) : (
                   <tr>
-                    <td colSpan={6}>No payment history found.</td>
+                    <td colSpan={7}>No payment history found.</td>
                   </tr>
                 )}
               </tbody>
@@ -236,10 +312,10 @@ export default PatientsInvoiceTable;
 // Import the new invoice styles
 
 const Invoice = React.forwardRef(({ patient, onBack }, ref) => {
-   const { toPDF, targetRef } = usePDF({filename: 'page.pdf'});
+  const { toPDF, targetRef } = usePDF({ filename: "page.pdf" });
   return (
     <div>
-       <button onClick={() => toPDF()}>Download PDF</button>
+      <button onClick={() => toPDF()}>Download PDF</button>
 
       <div ref={ref} className="invoice-container">
         <div className="invoice-header">
@@ -262,25 +338,39 @@ const Invoice = React.forwardRef(({ patient, onBack }, ref) => {
                 <table className="bordered-table">
                   <thead>
                     <tr>
+                      <th>S/N</th>
                       <th>Item</th>
+                      <th>Quantity</th>
                       <th>Cost</th>
                       <th>Amount Paid</th>
+                      <th>Discounted Amount</th>
+                      {/* <th>Discounted %</th> */}
                       <th>Balance</th>
                     </tr>
                   </thead>
                   <tbody>
                     {patient?.payments?.map((payment, index) => (
                       <tr key={index}>
+                        <td>{index + 1}</td>
                         <td>{payment.itemName}</td>
+                        <td>{payment.quantity}</td>
                         <td>N{payment.itemCost}</td>
                         <td>N{payment.amountPaid}</td>
+                        <td>
+                          N
+                          {payment.discountedAmount
+                            ? payment.discountedAmount
+                            : 0}
+                        </td>
+                        {/* <td>N{payment.discountApplied}</td> */}
                         <td>N{payment.patientBalance}</td>
                       </tr>
                     ))}
                   </tbody>
                   <tfoot>
                     <tr className="summary-row">
-                      <td colSpan="2">
+                      F
+                      <td colSpan="4">
                         <strong>Total Payments Made:</strong>
                       </td>
                       <td>

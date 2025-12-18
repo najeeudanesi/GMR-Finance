@@ -69,7 +69,7 @@ function PatientsPayments() {
           );
         } else {
           data = await get(
-            `/patientpayment/list/${page}/${500}/patient-payment-list-v2`
+            `/patientpayment/list/${page}/${pageSize}/patient-payment-list-v2`
           );
           console.log(data?.resultList);
           setCostData(data?.resultList || []);
@@ -143,7 +143,11 @@ function PatientsPayments() {
           <>
             {" "}
             <div className="">
-              <PatientsTable data={costData} />
+              <PatientsTable
+                data={costData}
+                currentPage={currentPage}
+                pageSize={pageSize}
+              />
             </div>
             <div className="m-t-20 flex flex-h-end">
               <Pagination

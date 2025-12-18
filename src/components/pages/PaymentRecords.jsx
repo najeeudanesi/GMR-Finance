@@ -5,10 +5,11 @@ import "../../assets/css/table.css";
 import moment from "moment";
 import SearchInput from "../UI/SearchInput";
 import SortInput from "../UI/SortInput";
+import DiscountCommentModal from "../modals/DiscountCommentModal";
 
 const PaymentRecords = () => {
   // Fetch service list from endpoint and map to service format
- 
+
   // Fetch lab category from endpoint
 
   const [page, setPage] = useState(1);
@@ -30,7 +31,7 @@ const PaymentRecords = () => {
     { value: "Category", label: "Category" },
     { value: "Service", label: "Service" },
     { value: "Amount", label: "Amount" },
-    // { value: "CreatedOn", label: "Created On" },
+    { value: "HMO", label: "HMO" },
     // { value: "ModifiedBy", label: "Modified By" },
   ];
 
@@ -87,7 +88,7 @@ const PaymentRecords = () => {
 
   const fetchLabCategory = async () => {
     try {
-      const response = await get("/category/list/1/10");
+      const response = await get("/category/list/1/20");
       console.log("Lab Category:", response?.resultList);
 
       setDocs(
@@ -102,11 +103,11 @@ const PaymentRecords = () => {
     }
   };
 
-   const fetchServiceList = async () => {
+  const fetchServiceList = async () => {
     try {
-      const response = await get("/categoryitem/list/1/10");
+      const response = await get("/categoryitem/list/1/20");
       console.log(response?.resultList);
-        setDocs(
+      setDocs(
         response?.resultList?.map((doc) => ({
           label: doc.itemName,
           value: doc.id,
@@ -166,6 +167,22 @@ const PaymentRecords = () => {
     setSearchText(event.target.value);
   };
 
+  const [showDiscountModal, setShowDiscountModal] = useState(false);
+  const [activeDiscountDetail, setActiveDiscountDetail] = useState(null);
+  const [cumulativeBreakdownCount, setCumulativeBreakdownCount] = useState(0);
+
+  // Calculate total breakdown count for current page
+  const currentPageBreakdownCount = paidUsers?.reduce((count, user) => {
+    return count + (user?.paymentBreakdowns?.length || 0);
+  }, 0);
+
+  // Update cumulative count when page changes
+  useEffect(() => {
+    if (page === 1) {
+      setCumulativeBreakdownCount(0);
+    }
+  }, [page, searchText, fromDate, toDate, sortBy]);
+
   // Filter by search
   // const filtered = paidUsers.filter(
   //     (user) =>
@@ -179,7 +196,8 @@ const PaymentRecords = () => {
       return (
         sum +
         user.paymentBreakdowns.reduce(
-          (subSum, breakdown) => subSum + (Number(breakdown.patientDeposit) || 0),
+          (subSum, breakdown) =>
+            subSum + (Number(breakdown.patientDeposit) || 0),
           0
         )
       );
@@ -205,7 +223,9 @@ const PaymentRecords = () => {
               placeholder="Sort by"
             />
           </div>
-          {sortBy === "Doctor" || sortBy === "Category" || sortBy === "Service" ? (
+          {sortBy === "Doctor" ||
+          sortBy === "Category" ||
+          sortBy === "Service" ? (
             <div className="w-75 flex">
               <SortInput
                 value={searchText}
@@ -257,89 +277,137 @@ const PaymentRecords = () => {
           />
         </div>
       </div>
-{/* 
+      {/* 
         <div style={{ margin: "16px 0", fontWeight: "bold" }}>
           Total Amount: ₦{totalAmount.toLocaleString()}
         </div> */}
 
-        {isLoading ? (
-          <div style={{ textAlign: "center", margin: "16px 0" }}>
-            <span>Loading...</span>
-          </div>
-        ) : (
-          <div>
-            <table className="bordered-table">
-          <thead>
-            <tr>
-              <th>Patient Name</th>
-              <th>Consulted Doctor</th>
-              <th>Payment Date</th>
-              <th>Payment Time</th>
-              <th>Category</th>
-              <th>Service</th>
-              <th>Amount</th>
-            </tr>
-          </thead>
-          <tbody className="white-bg view-det-pane">
-            {paidUsers.length > 0 ? (
-              <>
-            {paidUsers?.flatMap((user, idx) =>
-              user?.paymentBreakdowns && user?.paymentBreakdowns?.length > 0
-                ? user?.paymentBreakdowns.map((breakdown, bIdx) => (
-                <tr key={`${user.id || idx}-${breakdown.id || bIdx}`}>
-                  <td>{`${user?.patient?.firstName} ${user.patient?.lastName}`}</td>
-                  <td>
-                {user.attendedDoctor
-                  ? `${user.attendedDoctor.firstName || ""} ${
-                  user.attendedDoctor.lastName || ""
-                    }`
-                  : ""}
-                  </td>
-                  <td>
-                {moment(user.createdOn).format("YYYY-MM-DD ")}
-                  </td>
-                  <td>
-                {moment(user.createdOn).format(" HH:mm")}
-                  </td>
-                  <td>{breakdown.category?.name}</td>
-                  <td>{breakdown.serviceOrProductName}</td>
-                  <td>{breakdown.patientDeposit}</td>
-                </tr>
-              ))
-                : [
-                <tr key={`${user.id || idx}-empty`}>
-                  <td>{`${user.patient?.firstName} ${user.patient?.lastName}`}</td>
-                  <td>
-                {user.doctor
-                  ? `${user.doctor.firstName || ""} ${
-                  user.doctor.lastName || ""
-                    }`
-                  : ""}
-                  </td>
-                  <td>
-                {moment(user.createdOn).format("YYYY-MM-DD HH:mm")}
-                  </td>
-                  <td colSpan={3} style={{ textAlign: "center" }}>
-                No breakdowns
-                  </td>
-                </tr>,
-              ]
-            )}
-            <tr style={{ fontWeight: "bold", background: "#f9f9f9" }}>
-              <td colSpan={5} style={{ textAlign: "right" }}>Total Amount:</td>
-              <td>₦{paidUsers[0].totalAmount.toLocaleString()}</td>
-            </tr>
-              </>
-            ) : (
+      {isLoading ? (
+        <div style={{ textAlign: "center", margin: "16px 0" }}>
+          <span>Loading...</span>
+        </div>
+      ) : (
+        <div>
+          {showDiscountModal && (
+            <DiscountCommentModal
+              data={activeDiscountDetail}
+              closeModal={() => {
+                setShowDiscountModal(false);
+                setActiveDiscountDetail(null);
+              }}
+            />
+          )}
+          <table className="bordered-table">
+            <thead>
               <tr>
-            <td colSpan={6} style={{ textAlign: "center", padding: 16 }}>
-              No records found.
-            </td>
+                <th>S/N</th>
+                <th>Patient Name</th>
+                <th>Consulted Doctor</th>
+                <th>Payment Date</th>
+                <th>Payment Time</th>
+                <th>Category</th>
+                <th>Service</th>
+                <th>Discounted Amount</th>
+                <th>Paid Amount</th>
+                <th>Action</th>
               </tr>
-            )}
-          </tbody>
-            </table>
-            {/* Pagination Controls */}
+            </thead>
+            <tbody className="white-bg view-det-pane">
+              {paidUsers.length > 0 ? (
+                <>
+                  {(() => {
+                    let serialNumber = cumulativeBreakdownCount;
+                    return paidUsers?.flatMap((user, idx) =>
+                      user?.paymentBreakdowns &&
+                      user?.paymentBreakdowns?.length > 0
+                        ? user?.paymentBreakdowns.map((breakdown, bIdx) => (
+                            <tr
+                              key={`${user.id || idx}-${breakdown.id || bIdx}`}
+                            >
+                              <td>{++serialNumber}</td>
+                              <td>{`${user?.patient?.firstName} ${user.patient?.lastName}`}</td>
+                              <td>
+                                {user.attendedDoctor
+                                  ? `${user.attendedDoctor.firstName || ""} ${
+                                      user.attendedDoctor.lastName || ""
+                                    }`
+                                  : ""}
+                              </td>
+                              <td>
+                                {moment(user.createdOn).format("YYYY-MM-DD ")}
+                              </td>
+                              <td>{moment(user.createdOn).format(" HH:mm")}</td>
+                              <td>{breakdown.category?.name}</td>
+                              <td>{breakdown.serviceOrProductName}</td>
+                              <td>
+                                {breakdown.discountApplied
+                                  ? `${
+                                      breakdown.cost - breakdown?.patientDeposit
+                                    }`
+                                  : "-"}
+                              </td>
+                              <td>
+                                {breakdown.isHmoCovered
+                                  ? "HMO Covered"
+                                  : breakdown.patientDeposit}
+                              </td>
+                              <td>
+                                {breakdown.discountApplied && (
+                                  <button
+                                    onClick={() => {
+                                      setActiveDiscountDetail({
+                                        patient: user.patient || {},
+                                        breakdown,
+                                      });
+                                      setShowDiscountModal(true);
+                                    }}
+                                  >
+                                    View Discount Comment
+                                  </button>
+                                )}
+                              </td>
+                            </tr>
+                          ))
+                        : [
+                            <tr key={`${user.id || idx}-empty`}>
+                              <td>{++serialNumber}</td>
+                              <td>{`${user.patient?.firstName} ${user.patient?.lastName}`}</td>
+                              <td>
+                                {user.doctor
+                                  ? `${user.doctor.firstName || ""} ${
+                                      user.doctor.lastName || ""
+                                    }`
+                                  : ""}
+                              </td>
+                              <td>
+                                {moment(user.createdOn).format(
+                                  "YYYY-MM-DD HH:mm"
+                                )}
+                              </td>
+                              <td colSpan={3} style={{ textAlign: "center" }}>
+                                No breakdowns
+                              </td>
+                            </tr>,
+                          ]
+                    );
+                  })()}
+                  <tr style={{ fontWeight: "bold", background: "#f9f9f9" }}>
+                    <td colSpan={6} style={{ textAlign: "right" }}>
+                      Total Amount:
+                    </td>
+                    <td>₦{paidUsers[0].totalAmount.toLocaleString()}</td>
+                  </tr>
+                </>
+              ) : (
+                <tr>
+                  <td colSpan={10} style={{ textAlign: "center", padding: 16 }}>
+                    No records found.
+                  </td>
+                </tr>
+              )}
+            </tbody>
+          </table>
+          {/* Pagination Controls */}
           <div
             style={{
               display: "flex",
@@ -349,7 +417,12 @@ const PaymentRecords = () => {
             }}
           >
             <button
-              onClick={() => setPage((p) => Math.max(1, p - 1))}
+              onClick={() => {
+                setCumulativeBreakdownCount((prev) =>
+                  Math.max(0, prev - currentPageBreakdownCount)
+                );
+                setPage((p) => Math.max(1, p - 1));
+              }}
               disabled={page === 1}
               style={{ marginRight: 8 }}
             >
@@ -359,7 +432,12 @@ const PaymentRecords = () => {
               Page {page} of {totalPages}
             </span>
             <button
-              onClick={() => setPage((p) => Math.min(totalPages, p + 1))}
+              onClick={() => {
+                setCumulativeBreakdownCount(
+                  (prev) => prev + currentPageBreakdownCount
+                );
+                setPage((p) => Math.min(totalPages, p + 1));
+              }}
               disabled={page === totalPages}
             >
               Next

@@ -3,8 +3,7 @@ import { useNavigate } from "react-router-dom";
 import { formatDate } from "../../utility/general";
 import moment from "moment";
 
-function PatientsTable({ data }) {
-
+function PatientsTable({ data, currentPage = 1, pageSize = 20 }) {
   const navigate = useNavigate();
 
   return (
@@ -13,6 +12,7 @@ function PatientsTable({ data }) {
         <table className="bordered-table">
           <thead className="border-top-none ">
             <tr className="border-top-none ">
+              <th>S/N</th>
               <th>Date</th>
               <th>Time</th>
               <th>First Name</th>
@@ -26,10 +26,17 @@ function PatientsTable({ data }) {
 
           <tbody className="white-bg view-det-pane">
             {data?.map((row, index) => {
-
-
               return (
-                <tr key={index} className="pointer" onClick={() => navigate(`/finance/patients-payment/${row.paymentDetails[0].patient.id}`)}>
+                <tr
+                  key={index}
+                  className="pointer"
+                  onClick={() =>
+                    navigate(
+                      `/finance/patients-payment/${row.paymentDetails[0].patient.id}`
+                    )
+                  }
+                >
+                  <td>{(currentPage - 1) * pageSize + index + 1}</td>
                   <td>{moment(row.dateUpdated).format("YYYY-MM-DD")}</td>
                   <td>{moment(row.dateUpdated).format("HH:mm")}</td>
                   <td>{row?.firstName}</td>

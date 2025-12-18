@@ -29,6 +29,8 @@ function UpdateModal({
     amountPaid: "",
     availableBalance: 0,
     comment: "",
+    isHmoCovered: false,
+    paymentMethod: "CASH",
   });
   const [payload, setPayload] = useState({
     transactionPurpose: "",
@@ -44,11 +46,13 @@ function UpdateModal({
     if (paymentBreakdownData) {
       setFormData({
         patientId: parseInt(paymentBreakdownData?.patientId, 10),
-        amountPayableBy: "Patient",
+        amountPayableBy: formData?.amountPayableBy,
         amountOwed: paymentBreakdownData?.patientBalance || 0,
-        amountPaid: "",
+        amountPaid: formData.amountOwed,
+        isHmoCovered: formData?.amountPayableBy === "HMO" ? true : false,
         availableBalance: 0,
-        comment: "",
+        comment: "Fully Paid",
+        paymentMethod: "CASH",
       });
     }
   }, [paymentBreakdownData, depositBalance]);
@@ -56,11 +60,12 @@ function UpdateModal({
   useEffect(() => {
     setFormData((prevData) => ({
       ...prevData,
-      availableBalance: (paymentBreakdownData?.patientBalance) - (prevData.amountPaid || 0),
-      amountOwed:
-        formData?.amountPayableBy === "Patient"
-          ? paymentBreakdownData?.patientBalance
-          : paymentBreakdownData?.hmoBalance || 0,
+      availableBalance:
+        paymentBreakdownData?.patientBalance - (prevData.amountPaid || 0),
+      amountOwed: paymentBreakdownData?.patientBalance,
+      // formData?.amountPayableBy === "Patient"
+      //   ? paymentBreakdownData?.patientBalance
+      //   : paymentBreakdownData?.hmoBalance || 0,
     }));
   }, [formData.amountPaid, formData.amountOwed, formData.amountPayableBy]);
 
@@ -127,9 +132,12 @@ function UpdateModal({
           patientId: formData.patientId,
           paymentBreakdownId: paymentBreakdownData.id,
           amountOwed: formData.amountOwed,
-          amountPaid: formData.amountPaid,
+          amountPaid: formData.amountOwed,
+          // formData.amountPaid,
+          isHmoCovered: formData?.amountPayableBy === "HMO" ? true : false,
           availableBalance: formData.availableBalance,
-          comment: formData.comment,
+          comment: formData.comment||'fully Paid',
+          // paymentMethod: formData.paymentMethod,
         },
       ],
     };
@@ -145,7 +153,7 @@ function UpdateModal({
       );
 
       toast.success("Payment record updated successfully");
-      navigate(`/finance/patients-payment`);
+      // navigate(`/finance/patients-payment`);
 
       onClose(); // Close the modal on successful submission
     } catch (e) {
@@ -229,7 +237,27 @@ function UpdateModal({
                   >
                     <option value="Patient">Patient</option>
                     <option value="HMO">HMO</option>
-                    <option value="wallet">Pay FRom Wallet</option>
+                    <option value="wallet">Pay From Wallet</option>
+                    <option value="retainership">Retainership</option>
+                  </select>
+                </div>
+
+                <div className="flex m-t-10">
+                  <label htmlFor="paymentMethod" className="label">
+                    Payment Method
+                  </label>
+                  <select
+                    name="paymentMethod"
+                    value={formData.paymentMethod}
+                    onChange={handleChange}
+                    required
+                    className="input-field"
+                  >
+                    <option value="CASH">Cash</option>
+                    <option value="POS">POS</option>
+                    <option value="Deposit">Deposit</option>
+                    <option value="Bank Transfer">Bank Transfer</option>
+                    <option value="Card">Card</option>
                   </select>
                 </div>
 
@@ -241,11 +269,16 @@ function UpdateModal({
                   type="number"
                   disabled
                 />
-                 <InputField
+                <InputField
                   label="Discounted Amount"
                   name="discountedAmount"
-                  value={paymentBreakdownData.discountedAmount||0}
-                  onChange={handleChange}
+                  value={
+                    paymentBreakdownData.discountedAmount
+                      ? paymentBreakdownData.cost -
+                        paymentBreakdownData.discountedAmount
+                      : 0
+                  }
+                  // onChange={handleChange}
                   type="number"
                   // disabled
                 />
@@ -261,7 +294,7 @@ function UpdateModal({
                 <InputField
                   label="Available Balance"
                   name="availableBalance"
-                  value={formData.availableBalance }
+                  value={formData.availableBalance}
                   onChange={handleChange}
                   type="number"
                   required
@@ -284,7 +317,10 @@ function UpdateModal({
                       <div
                         className="btn w-10"
                         onClick={() =>
-                          setFormData({ ...formData, amountPayableBy: "Patient" })
+                          setFormData({
+                            ...formData,
+                            amountPayableBy: "Patient",
+                          })
                         }
                       >
                         Back

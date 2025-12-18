@@ -96,7 +96,7 @@ function CreateHmo() {
     return (
         <div className='flex gap-10'>
             <div className='w-40'>
-                <InputField label="Vendor's Name" value={vendorName} onChange={(e) => setVendorName(e.target.value)} />
+                <InputField label="HMO's Name" value={vendorName} onChange={(e) => setVendorName(e.target.value)} />
 
                 {vendorNameError && <span className="error-message">{vendorNameError}</span>}
                 <InputField label="Phone Number" value={phoneNumber} onChange={(e) => setPhoneNumber(e.target.value)} />

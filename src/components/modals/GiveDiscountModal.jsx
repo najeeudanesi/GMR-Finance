@@ -29,6 +29,7 @@ function UpdateModal({
     // appointmentId: 0,
     doctorId: 0,
     discountPercentage: 0,
+    discountAmount: 0,
     categoryItemId: 0,
   });
   const [payload, setPayload] = useState({
@@ -57,6 +58,7 @@ function UpdateModal({
         // appointmentId: topData?.appointmentId || 0,
         doctorId: 235,
         discountPercentage: 0,
+        discountAmount: 0,
         categoryItemId: paymentBreakdownData?.serviceOrProductId || 0,
       });
     }
@@ -96,10 +98,39 @@ function UpdateModal({
 
   const handleChange = (e) => {
     const { name, value } = e.target;
-    const intFields = ["amountOwed", "amountPaid", "availableBalance"];
+    const intFields = [
+      "amountOwed",
+      "amountPaid",
+      "availableBalance",
+      "discountPercentage",
+      "discountAmount",
+    ];
+    const originalCost = paymentBreakdownData?.cost || amountOwed || 0;
 
     if (intFields.includes(name)) {
-      setFormData({ ...formData, [name]: parseInt(value, 10) });
+      const numericValue = parseFloat(value) || 0;
+
+      if (name === "discountAmount") {
+        // Calculate percentage when discount amount is entered
+        const calculatedPercentage =
+          originalCost > 0 ? (numericValue / originalCost) * 100 : 0;
+        setFormData({
+          ...formData,
+          [name]: numericValue,
+          discountPercentage: Math.round(calculatedPercentage * 100) / 100, // Round to 2 decimal places
+        });
+      } else if (name === "discountPercentage") {
+        // Calculate amount when percentage is entered
+        const calculatedAmount =
+          originalCost > 0 ? (numericValue / 100) * originalCost : 0;
+        setFormData({
+          ...formData,
+          [name]: numericValue,
+          discountAmount: Math.round(calculatedAmount * 100) / 100, // Round to 2 decimal places
+        });
+      } else {
+        setFormData({ ...formData, [name]: numericValue });
+      }
     } else {
       setFormData({ ...formData, [name]: value });
     }
@@ -213,10 +244,23 @@ function UpdateModal({
       <div className="modal-box max-w-800">
         <div className="p-40">
           <div className="flex justify-between items-center mb-4">
-            <h3 className="bold-text">Make payment For Servicezzs</h3>
+            <h3 className="bold-text">Give discounts For Services</h3>
             <RiCloseFill className="close-btn pointer" onClick={onClose} />
           </div>
           <form className="m-t-20">
+             {paymentBreakdownData?.cost && (
+                <div className="font-xs m-t-10" style={{ color: "#666" }}>
+                  Original Cost: ₦{paymentBreakdownData.cost.toLocaleString()}
+                  {formData.discountAmount > 0 && (
+                    <span className="m-l-10">
+                      Final Amount: ₦
+                      {(
+                        paymentBreakdownData.cost - formData.discountAmount
+                      ).toLocaleString()}
+                    </span>
+                  )}
+                </div>
+              )}
             <div className="flex flex-col gap-3 m-t-20">
               <InputField
                 label="Comment"
@@ -226,14 +270,27 @@ function UpdateModal({
                 required
               />
 
-              <InputField
-                label="Discount Percentage"
-                name="discountPercentage"
-                value={formData.discountPercentage || ""}
-                onChange={handleChange}
-                type="number"
-                required
-              />
+              <div className="gap-3">
+                <InputField
+                  label="Discount Amount (₦)"
+                  name="discountAmount"
+                  value={formData.discountAmount || ""}
+                  onChange={handleChange}
+                  type="number"
+                  placeholder="Enter discount amount"
+                />
+
+                <InputField
+                  label="Discount Percentage (%)"
+                  name="discountPercentage"
+                  value={formData.discountPercentage || ""}
+                  onChange={handleChange}
+                  type="number"
+                  placeholder="Enter discount percentage"
+                />
+              </div>
+
+             
             </div>
             <button
               type="submit"

@@ -14,6 +14,8 @@ function CategoriesTable({
   setCategoryObject,
   setCategoryName,
   fetchData,
+  currentPage = 1,
+  pageSize = 10,
 }) {
   const [modalData, setModalData] = useState(null); // State to store the data for the modal
   const [noteModalData, setNoteModalData] = useState(null); // State to store the data for the note modal
@@ -39,8 +41,6 @@ function CategoriesTable({
     setCategoryName(row.name);
   };
 
-
-
   return (
     <div className="w-100">
       {!isloading ? (
@@ -48,6 +48,7 @@ function CategoriesTable({
           <table className="bordered-table-2">
             <thead className="border-top-none">
               <tr className="border-top-none">
+                <th>S/N</th>
                 <th className="w-20">Date</th>
                 <th>Name</th>
 
@@ -57,8 +58,9 @@ function CategoriesTable({
             </thead>
 
             <tbody className="white-bg">
-              {data?.map((row) => (
+              {data?.map((row, index) => (
                 <tr key={row?.id}>
+                  <td>{(currentPage - 1) * pageSize + index + 1}</td>
                   <td>{formatDate(row?.createdAt)}</td>
                   <td>{row?.name}</td>
 

@@ -12,7 +12,7 @@ import insurance from '../assets/images/insurance.png';
 export default [
     { title: 'Dashboard', href: '/finance/dashboard', icon: <RiBarChartFill className='icon' /> },
     { title: 'Patient Payment', href: '/finance/patients-payment', icon: <img src={patient} className='icon' /> },
-    { title: 'Cost SetUp', href: '/finance/cost-setup', icon: <img src={wallet} className='icon' /> },
+    // { title: 'Cost SetUp', href: '/finance/cost-setup', icon: <img src={wallet} className='icon' /> },
     { title: 'Insurance (HMO)', href: '/finance/insurance', icon: <img src={insurance} className='icon' /> },
     { title: 'Manage Inventory', href: '/finance/manage-inventory', icon: <img src={payment} className='icon' /> },
     { title: 'Settings', href: '/finance/settings', icon: <img src={payment} className='icon' /> },

@@ -125,6 +125,7 @@ function InventoryTable() {
           <table className="bordered-table">
             <thead className="border-top-none">
               <tr className="border-top-none">
+                <th>S/N</th>
                 <th>Item</th>
                 <th>Inventory Id</th>
                 <th>Manufacturer</th>
@@ -140,6 +141,7 @@ function InventoryTable() {
             <tbody className="white-bg view-det-pane">
               {filteredData?.map((row, index) => (
                 <tr key={index}>
+                  <td>{(currentPage - 1) * pageSize + index + 1}</td>
                   <td>{row.productName}</td>
                   <td>{row.inventoryNumber}</td>
                   <td>{row.manufacturer}</td>

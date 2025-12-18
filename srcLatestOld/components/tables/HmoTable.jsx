@@ -21,7 +21,7 @@ function HmoTable({ data, isloading, patientId }) {
                                     <thead className="border-top-none">
                                         <tr className="border-top-none">
                                             <th className="w-20">Date</th>
-                                            <th>Vendor's Name</th>
+                                            <th>HMO's Name</th>
                                             <th>Packages</th>
                                             <th>Contact Information</th>
                                             <th>Phone Number</th>

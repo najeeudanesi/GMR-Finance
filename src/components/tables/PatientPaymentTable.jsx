@@ -5,6 +5,7 @@ import { get, del } from "../../utility/fetch";
 import toast from "react-hot-toast";
 import UpdateModal from "../modals/UpdateModal";
 import GiveDiscountModal from "../modals/GiveDiscountModal";
+import moment from "moment/moment";
 // ...existing code...
 
 // ...existing code...
@@ -151,6 +152,7 @@ function PatientPaymentTable({ patientId }) {
               <tr className="border-top-none">
                 <th className="w-10">Date</th>
                 <th>Diagnosis</th>
+                <th>Discount Comments</th>
                 <th className="w-60">Payment Breakdown</th>
                 {/* <th>Deposit</th>
                 <th>Balance</th> */}
@@ -159,8 +161,14 @@ function PatientPaymentTable({ patientId }) {
             <tbody className="white-bg view-det-pane">
               {data.map((row) => (
                 <tr key={row.id}>
-                  <td>{formatDate(row?.createdOn)}</td>
+                  <td>
+                    <p>{formatDate(row?.createdOn)}</p>
+                        <p>{moment(row?.createdOn).format('h:mm A')}</p>
+                    {/* <p>{moment(row?.createdOn).format('HH;MM')}</p> */}
+                  </td>
                   <td>{row?.diagnosis}</td>
+                  <td>{row?.discountComments}</td>
+
                   <td className="font-xs">
                     {row?.paymentBreakdowns && (
                       <div>
@@ -185,7 +193,7 @@ function PatientPaymentTable({ patientId }) {
                               <tr key={index}>
                                 <td>{item?.serviceOrProductName}</td>
                                 <td>{item?.cost}</td>
-                                <td>{item?.hmoDuePay}</td>
+                                <td>{row?.hasHmo?'':item?.hmoDuePay}</td>
                                 <td>{item?.hmoCover}</td>
                                 <td
                                   className={
@@ -197,7 +205,9 @@ function PatientPaymentTable({ patientId }) {
                                   {item?.hmoBalance}
                                 </td>
                                 <td>{item?.duePay}</td>
-                                <td>{item.cost - item?.discountedAmount || 0}</td>
+                                <td>
+                                  {item?.discountedAmount ? item.cost - item?.discountedAmount || 0 : 0}
+                                </td>
                                 <td
                                   className={
                                     item.patientBalance > 0
